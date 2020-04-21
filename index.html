@@ -8,18 +8,13 @@
 </head>
 <body>
     <h1>Cerclage Helper</h1>
-    <div class="ligne_commande">
-        <div class="colis_infos">
-            <label for="input_colis">Colis:</label>
-            <input type="number" id="input_colis" name="input_colis" min="0" max="500" size="1">
-        </div>
-        <div class="cagette_infos">
-            <label for="input_cagette">Type cagette:</label>
-            <input type="text" id="input_cagette" name="input_cagette" required maxlength="50" size="10">
-        </div>
-        <div class="palette_infos">
-            <button>=</button>
-        </div>
+
+    <div id="inserer_valider">
+        <button id="btn_ajouter_commande" onclick="ajout_commande()">+</button>
+        <button id="btn_valider" onclick="valider()">OK</button>
     </div>
+    
+
+    <script src="js/script.js"></script>
 </body>
 </html>
