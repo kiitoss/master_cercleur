@@ -1,0 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    max-width: 100vh;
+    background-color: rgb(37, 34, 33);
+    color: rgb( 213, 209, 208 );
+    margin: auto;
+    text-align: center;
+}
+
+h1 {
+    line-height: 10vh;
+    margin-bottom: 2vh;
+}
+.ligne_commande {
+    margin: auto;
+    width: 90vw;
+    max-width: 100vh;
+    display: table;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.colis_infos {
+    display:table-cell;
+}
+
+.cagette_infos {
+    display:table-cell;
+}
+
+.palette_infos {
+    display:table-cell;
+    vertical-align: bottom;
+}
