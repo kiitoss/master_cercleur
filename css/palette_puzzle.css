@@ -1,0 +1,37 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    max-width: 100vh;
+    background-color: rgb(37, 34, 33);
+    color: rgb( 213, 209, 208 );
+    margin: auto;
+    text-align: center;
+}
+
+
+
+#choix_palettes {
+    display: table;
+    width: 100vw;
+    max-width: 100vh;
+}
+
+.palette_cliquable {
+    display: table-cell;
+    width: 15vw;
+    max-width: 15vh;
+}
+
+
+#affichage_palette {
+    width: 90vw;
+    max-width: 90vh;
+    background-color: rgb(70, 50, 43);
+    margin: auto;
+    border-radius: 20px;
+    margin-top: 5vh;
+}
+

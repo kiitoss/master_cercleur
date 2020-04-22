@@ -1,7 +1,7 @@
 function ajout_commande(quantite=1) {
     // Ajoute une nouvelle ligne pour une nouvelle commande.
     for (let i = 0; i < quantite; i++) {
-        let body = document.body;
+        let main_part = document.getElementById("main");;
         let inserer_valider = document.getElementById("inserer_valider");
 
         let nouvelle_ligne = document.createElement("div");
@@ -60,7 +60,7 @@ function ajout_commande(quantite=1) {
         nouvelle_ligne.appendChild(cagette_infos);
         nouvelle_ligne.appendChild(palette_infos);
 
-        body.insertBefore(nouvelle_ligne, inserer_valider);
+        main_part.insertBefore(nouvelle_ligne, inserer_valider);
     }
 }
 

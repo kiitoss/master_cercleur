@@ -1,3 +1,29 @@
+@keyframes animation_entree {
+    0% {
+        margin-top: 35vh;
+        opacity: 0;
+    }
+    50% {
+        margin-top: 35vh;
+        opacity: 1;
+    }
+    100% {
+        margin-top: 0vh;
+    }
+}
+
+@keyframes apparition_entree {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -12,10 +38,22 @@ body {
 }
 
 h1 {
-    line-height: 10vh;
-    margin-bottom: 2vh;
+    line-height: 7vh;
+    width: 70vw;
+    max-width: 70vh;
+    font-size: x-large;
+    margin: auto auto 5vh;
+    border-top: thick double white;
+    border-bottom: thick double white;
+    animation-duration: 2s;
+    animation-name: animation_entree;
 }
 
+
+#main {
+    animation-duration: 4s;
+    animation-name: apparition_entree;
+}
 
 .ligne_commande {
     margin: auto;
