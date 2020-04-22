@@ -27,12 +27,20 @@ body {
 
 
 #affichage_palette {
+    position: relative;
     width: 90vw;
     max-width: 90vh;
     background-color: rgb(70, 50, 43);
     margin: auto;
     border-radius: 20px;
     margin-top: 5vh;
+}
+
+.dessin_commande {
+    position: absolute;
+    width: 70vw;
+    max-width: 70vh;
+    left: min(10vw, 10vh);
 }
 
 #barre_maximum {
