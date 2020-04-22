@@ -13,13 +13,13 @@ body {
 
 
 
-#choix_palettes {
+#choix_commandes {
     display: table;
     width: 100vw;
     max-width: 100vh;
 }
 
-.palette_cliquable {
+.commande_cliquable {
     display: table-cell;
     width: 15vw;
     max-width: 15vh;
@@ -35,3 +35,18 @@ body {
     margin-top: 5vh;
 }
 
+#barre_maximum {
+    width: 90vw;
+    max-width: 90vh;
+    /* height: 1px; */
+    border: 1px solid red;
+    position: relative;
+}
+
+#barre_danger {
+    width: 90vw;
+    max-width: 90vh;
+    /* height: 1px; */
+    border: 1px solid orange;
+    position: relative;
+}
