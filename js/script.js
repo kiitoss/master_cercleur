@@ -197,6 +197,7 @@ function creation_commande_p2(commande_id=null) {
     document.getElementById("ac_bouton_valider").style.display = "none";
     document.getElementById("ac_main_ajout_commande").innerHTML = "";
     document.getElementById("ac_titre_ajout_commande").innerHTML = "Type de colis";
+    let couleurs = ["rgb(29, 27, 27)", "rgb(48, 42, 40)"];
 
     // Création de la liste de choix.
     let main_part = document.getElementById("ac_main_ajout_commande");
@@ -216,6 +217,8 @@ function creation_commande_p2(commande_id=null) {
             }
                        
         }
+        nouveau_colis.style.backgroundColor = couleurs[i%2];
+
         let case_colis = document.createElement("input");
         case_colis.setAttribute("type", "radio");
         case_colis.setAttribute("name", "colis");
