@@ -30,17 +30,16 @@
 }
 
 body {
-    max-width: 100vh;
+    width: min(100vw, 100vh);
     background-color: rgb(37, 34, 33);
     color: rgb( 213, 209, 208 );
     margin: auto;
     text-align: center;
 }
 
-h1 {
+#titre_page {
     line-height: 7vh;
-    width: 70vw;
-    max-width: 70vh;
+    width: min(70vw, 70vh);
     font-size: x-large;
     margin: auto auto 5vh;
     border-top: thick double white;
@@ -57,8 +56,7 @@ h1 {
 
 .ligne_commande {
     margin: auto;
-    width: 90vw;
-    max-width: 100vh;
+    width: min(90vw, 90vh);
     display: table;
     margin-top: 2vh;
     margin-bottom: 2vh;
@@ -82,8 +80,69 @@ h1 {
     margin-top: 4vh;
 }
 
-#btn_ajouter_commande {
-    border-radius: 30px;
-    width: 30px;
-    height: 30px;
+
+
+
+
+
+
+#ajouter_commande {
+    display: none;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    width: min(100vw, 100vh);
+    left: calc(100vw/2 - calc(min(100vw, 100vh)/2));
+    background-color: red;
 }
+
+#ac_titre_ajout_commande {
+    line-height: 7vh;
+    margin: auto auto 5vh;
+}
+
+#ac_bouton_retour_arriere {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+
+
+#ac_main_ajout_commande {
+    margin-bottom: 7vh;
+}
+
+
+
+#ac_input_colis {
+    width: min(50vw, 50vh);
+    height: 7vh;
+    text-align: center;
+    font-size: xx-large;
+}
+
+
+
+
+
+.ac_LC_colis {
+    font-size: x-large;
+    display: flex;
+    flex-direction: row;
+    width: min(65vw, 65vh);
+    margin-right: 0;
+    margin-left: auto;
+    line-height: 7vh;
+    align-items: center;
+}
+
+.ac_case_colis {
+    width: min(5vw, 5vh);
+}
+.ac_label_colis {
+    width: min(60vw, 60vh);
+    text-align: left;
+    padding-left: min(3vw, 3vh);
+}
+

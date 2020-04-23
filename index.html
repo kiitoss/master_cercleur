@@ -7,14 +7,21 @@
     <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 <body>
-    <h1>Cerclage Helper</h1>
+    <h1 id="titre_page">Cerclage Helper</h1>
     <section id="main">
         <div id="inserer_valider">
-            <button id="btn_ajouter_commande" onclick="ajout_commande()">+</button>
-            <button id="btn_valider" onclick="valider()">OK</button>
+            <button id="btn_ajouter_commande" onclick="creation_commande_p1()">Nouvelle commande</button>
+            <button id="btn_valider" onclick="valider()">valider</button>
         </div>
     </section>
     
+    <section id="ajouter_commande">
+        <button id="ac_bouton_retour_arriere">Back</button>
+        <h1 id="ac_titre_ajout_commande"></h1>
+        <div id="ac_main_ajout_commande"></div>
+        <button onclick="terminer_ajout(false)">annuler création</button>
+        <button id="ac_bouton_suivant"></button>
+    </section>
 
     <script src="js/script.js"></script>
 </body>
