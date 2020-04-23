@@ -93,7 +93,7 @@ body {
     height: 100vh;
     width: min(100vw, 100vh);
     left: calc(100vw/2 - calc(min(100vw, 100vh)/2));
-    background-color: red;
+    background-color: rgb(37, 34, 33);
 }
 
 #ac_titre_ajout_commande {
@@ -122,6 +122,20 @@ body {
     font-size: xx-large;
 }
 
+#ac_bouton_valider {
+    width: min(15vw, 15vh);
+    height: 9vh;
+    font-size: large;
+    text-align: center;
+    position: absolute;
+    right: min(7vw, 7vh);
+    top: 12vh;
+    background-color: green;
+    border-color: green;
+    color: white;
+    border-radius: 20px;
+}
+
 
 
 
@@ -131,11 +145,11 @@ body {
     display: flex;
     flex-direction: row;
     width: min(65vw, 65vh);
-    margin-right: 0;
-    margin-left: auto;
+    padding-left: min(35vw, 35vh);
     line-height: 7vh;
     align-items: center;
 }
+
 
 .ac_case_colis {
     width: min(5vw, 5vh);
@@ -146,3 +160,12 @@ body {
     padding-left: min(3vw, 3vh);
 }
 
+
+.ac_bouton_palette {
+    display: block;
+    margin: auto;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+    width: 10vh;
+    height: 10vh;
+}
