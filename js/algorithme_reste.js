@@ -1,6 +1,6 @@
 var hauteur_max_colis = 0;
-var aire_palette = 23;
-var LC = [new Commande(12,2,20), new Commande(8,4,30), new Commande(4,2,10)];
+var aire_palette = 8;
+var LC = [new Commande(1,3,10), new Commande(2,3,13)];
 
 
 function Commande(aire, quantite, hauteur) {

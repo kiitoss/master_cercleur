@@ -13,7 +13,7 @@ function ajout_commande() {
 
     let nouvelle_ligne = document.createElement("div");
     nouvelle_ligne.setAttribute("class", "ligne_commande");
-    nouvelle_ligne.setAttribute("id", "ligne_commande_"+status_creation_commande.id_commande);
+    nouvelle_ligne.setAttribute("id", "lc_"+status_creation_commande.id_commande);
 
 
     let colis_infos = document.createElement("div");
@@ -305,3 +305,17 @@ function creation_commande_p3(commande_id=null) {
     }
 }
 
+function valider() {
+    let liste_commandes = [];
+    lignes_commandes = document.getElementsByClassName("ligne_commande");
+    for (let i=0; i<lignes_commandes.length; i++) {
+        let id_commande = parseInt(lignes_commandes[i].getAttribute("id").substr(3));
+        let nb_colis_commande = parseInt(document.getElementById("nb_colis_commande_"+id_commande).value);
+        let type_cagette_commande = document.getElementById("type_cagette_commande_"+id_commande).value;
+        let nb_palettes_commande = document.getElementById("nb_palettes_commande_"+id_commande).innerHTML;
+        liste_commandes.push([nb_colis_commande, type_cagette_commande, nb_palettes_commande])
+    }
+    // console.log(liste_commandes);
+    localStorage.setItem('CH_listeCommandes', liste_commandes.toString());
+    location.href = "./palette_puzzle.html";
+}

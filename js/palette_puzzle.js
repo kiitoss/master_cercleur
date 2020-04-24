@@ -1,16 +1,30 @@
-// Fonction principale:
-// Créé les boutons correspondant aux commandes,
-// Redimensionne la section "affichage_palette".
 var ratio_hauteur = 1;
 var couleurs = ["red", "blue", "green", "yellow"];
 var pos_derniere_commande;
 var commandes_places = [];
 
+
+// Récupération des variables stockées en locale.
+var commande_recues = [];
+var CH_listeCommandes = localStorage.getItem('CH_listeCommandes');
+if ((!CH_listeCommandes) || (CH_listeCommandes.split(',').length%3 != 0)) {
+    alert("Erreur passation liste commandes.");
+    location.href = "./index.html";
+}
+else {
+    CH_listeCommandes = CH_listeCommandes.split(',')
+    for (let i=0; i<CH_listeCommandes.length; i+=3) {
+        commande_recues.push([CH_listeCommandes[i], CH_listeCommandes[i+1], CH_listeCommandes[i+2]]);
+    }
+    main();
+}
+
+
 function main() {
-    let commande_recues = [[10, "aa"], [20, "aa"], [15, "aa"], [30, "aa"]];
+    // let commande_recues = [[10, "aa"], [20, "aa"], [15, "aa"], [30, "aa"]];
     let liste_commandes = [];
     for (let i=0; i<commande_recues.length; i++) {
-        liste_commandes.push(new Commande(i, commande_recues[i][0], commande_recues[i][1]));
+        liste_commandes.push(new Commande(i, commande_recues[i][0], commande_recues[i][1], commande_recues[i][2]));
     }
 
     affiche_barres_max_danger();
@@ -47,7 +61,7 @@ function affiche_barres_max_danger() {
 
 
 // Objet commande, correspond à une commande (une quantité et un type de colis).
-function Commande(id, nb_colis, type_colis) {
+function Commande(id, nb_colis, type_colis, nb_palettes) {
     this.id = id;
     index_couleur = id;
     while (index_couleur > couleurs.length) {
@@ -58,6 +72,7 @@ function Commande(id, nb_colis, type_colis) {
     this.position_y = 0;
     this.nb_colis = nb_colis;
     this.type_colis = type_colis;
+    this.nb_palettes = nb_palettes;
     this.hauteur = calcule_hauteur(nb_colis, type_colis);
     creer_bouton_commande(this);
 }
@@ -122,9 +137,3 @@ function ajout_suppression_commande(commande) {
     commande.estAffiche = !commande.estAffiche;
     
 }
-
-
-
-
-
-main();
