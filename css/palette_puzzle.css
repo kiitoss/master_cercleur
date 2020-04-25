@@ -1,60 +1,106 @@
+@keyframes flash {
+    50% {
+        background-color: rgb(37, 34, 33);
+    }
+}
+
+
 * {
     margin: 0;
     padding: 0;
 }
 
 body {
-    max-width: 100vh;
+    width: min(100vw, 100vh);
     background-color: rgb(37, 34, 33);
     color: rgb( 213, 209, 208 );
     margin: auto;
     text-align: center;
+    position: relative;
 }
 
 
 
 #choix_commandes {
     display: table;
-    width: 100vw;
-    max-width: 100vh;
+    width: min(90vw, 90vh);
+    position: relative;
+    left: min(10vw, 10vh);
 }
 
 .commande_cliquable {
     display: table-cell;
-    width: 15vw;
-    max-width: 15vh;
+    width: min(15vw, 15vh);
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    height: 4vh;
 }
 
 
 #affichage_palette {
     position: relative;
-    width: 90vw;
-    max-width: 90vh;
-    background-color: rgb(70, 50, 43);
+    width: min(90vw, 90vh);
     margin: auto;
+    background-color: rgb(70, 50, 43);
     border-radius: 20px;
     margin-top: 5vh;
+    overflow: hidden;
 }
+
+.affichage_palette_ok {
+    background-color: rgb(37, 34, 33);
+
+}
+
+.affichage_palette_danger {
+    background-color: orange;
+    animation: flash 3s infinite;
+}
+
+.affichage_palette_sup_max {
+    background-color: red;
+    animation: flash 1.5s infinite;
+}
+
 
 .dessin_commande {
     position: absolute;
-    width: 70vw;
-    max-width: 70vh;
-    left: min(10vw, 10vh);
+    border-top: 2px dashed black;
+    width: min(90vw, 90vh);
+}
+
+.dessin_colis {
+    width: min(70vw, 70vh);
+    display: inline-block;
+    vertical-align: text-top;
+    color: black;
+}
+
+.label_hauteur_commande {
+    width: min(20vw, 20vh);
+    display: inline-block;
+    font-size: small;
 }
 
 #barre_maximum {
-    width: 90vw;
-    max-width: 90vh;
-    /* height: 1px; */
+    width: min(90vw, 90vh);
     border: 1px solid red;
     position: relative;
+    z-index: 1;
 }
 
 #barre_danger {
-    width: 90vw;
-    max-width: 90vh;
-    /* height: 1px; */
+    width: min(90vw, 90vh);
     border: 1px solid orange;
     position: relative;
+    z-index: 1;
+}
+
+
+#bouton_retour_arriere {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(10vw, 10vh);
 }
