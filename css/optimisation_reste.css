@@ -1,0 +1,72 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: min(100vw, 100vh);
+    background-color: rgb(37, 34, 33);
+    color: rgb( 213, 209, 208 );
+    margin: auto;
+    text-align: center;
+    height: 100vh;
+}
+
+
+
+#affichage_palette {
+    position: relative;
+    width: min(90vw, 90vh);
+    margin: auto;
+    background-color: rgb(70, 50, 43);
+    border-radius: 20px;
+    margin-top: 5vh;
+    overflow: hidden;
+
+    height: 200px;
+}
+
+
+
+
+
+.dessin_commande {
+    position: absolute;
+    border-top: 2px dashed black;
+    width: min(90vw, 90vh);
+}
+
+.dessin_colis {
+    width: min(70vw, 70vh);
+    display: inline-block;
+    vertical-align: text-top;
+    color: black;
+}
+
+.label_hauteur_commande {
+    width: min(20vw, 20vh);
+    display: inline-block;
+    font-size: small;
+}
+
+#barre_maximum {
+    width: min(90vw, 90vh);
+    border: 1px solid red;
+    position: relative;
+    z-index: 1;
+}
+
+#barre_danger {
+    width: min(90vw, 90vh);
+    border: 1px solid orange;
+    position: relative;
+    z-index: 1;
+}
+
+
+#bouton_retour_arriere {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(10vw, 10vh);
+}

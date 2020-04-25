@@ -9,12 +9,18 @@
 <body class="affichage_palette_ok">
     <button id="bouton_retour_arriere" onclick="history.go(-1)">Back</button>
     <section id="choix_commandes"></section>
+    <p id="label_hauteur_actuelle">Hauteur actuelle: 0</p>
 
     <section id="affichage_palette">
         <div id="barre_maximum"></div>
         <div id="barre_danger"></div>
     </section>    
 
+    <button id="bouton_optimiser" onclick="optimiser()">Optimiser</button>
+    <div id="ligne_optimiser">
+        <button id="valider_optimisation" onclick="annuler_optimisation()">Annuler</button>
+        <button id="annuler_optimisation" onclick="valider_optimisation()">Valider</button>
+    </div>
     <script src="js/palette_puzzle.js"></script>
 </body>
 </html>
