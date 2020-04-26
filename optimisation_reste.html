@@ -9,10 +9,23 @@
 <body>
     <button id="bouton_retour_arriere" onclick="history.go(-1)">Back</button>
 
+    <section id="colis_restants">
+        <ul id="liste_colis_retants"></ul>
+    </section>
+    <section id="solution_palette"></section>
     <section id="affichage_palette">
         <div id="barre_maximum"></div>
         <div id="barre_danger"></div>
-    </section>    
+        <div id="dessin_commande">
+    </section>
+
+    <div id="fleche">
+        <div id="fleche_haut"></div>
+        <div id="trait_fleche"></div>
+        <div id="fleche_bas"></div>
+    </div>
+
+    <p id="label_taille_restante"></p>
 
     <script src="js/optimisation_reste.js"></script>
 </body>

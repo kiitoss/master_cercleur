@@ -7,10 +7,10 @@ var hauteur_actuelle = 0;
 var optimisation_en_cours = false;
 var commandes_aOptimiser = [];
 
-var hauteur_colis = [
-    ["carton bois", 5, 8, "brown"],
+var infos_colis = [
+    ["carton bois", 10.5, 8, "brown"],
     ["carton beige", 2, 8, "yellow"],
-    ["IFCO", 250, 1, "green"]
+    ["IFCO", 250, 2, "green"]
 ];
 
 // Récupération des variables stockées en local.
@@ -74,6 +74,7 @@ function Commande(id, nb_colis, type_colis, nb_palettes) {
     this.position_y = 0;
 
     this.aOptimiser = false;
+    this.hauteur_reste = 0;
 
     creer_bouton_commande(this);
 }
@@ -95,11 +96,11 @@ function creer_bouton_commande(commande) {
 // Affecte aux commande les hauteurs (normale et redimensionnées pour la page) et la couleur.
 function affecte_hauteurs_couleur(commande) {
     colis_existe = false;
-    for (let i=0; i<hauteur_colis.length; i++) {
-        if (hauteur_colis[i][0] == commande.type_colis) {
-            hauteur = hauteur_colis[i][1];
-            nb_par_rang = hauteur_colis[i][2];
-            couleur = hauteur_colis[i][3];
+    for (let i=0; i<infos_colis.length; i++) {
+        if (infos_colis[i][0] == commande.type_colis) {
+            hauteur = infos_colis[i][1];
+            nb_par_rang = infos_colis[i][2];
+            couleur = infos_colis[i][3];
             colis_existe = true;
             break;
         }
@@ -110,16 +111,17 @@ function affecte_hauteurs_couleur(commande) {
         return 0;
     }
 
-    commande.reste = commande.nb_colis % nb_par_rang
+    commande.reste = commande.nb_colis % nb_par_rang;
     commande.hauteur_main = parseInt(commande.nb_colis / nb_par_rang) * hauteur;
     if (commande.reste != 0) {
         commande.hauteur = commande.hauteur_main + hauteur;
         commande.ratio_reste = commande.reste / nb_par_rang;
+        commande.hauteur_reste = hauteur;
     }
     else {
         commande.hauteur = commande.hauteur_main;
     }
-    
+
     commande.hauteur_redimensionne = commande.hauteur * ratio_hauteur - 2;
     commande.hauteur_main_redim = commande.hauteur_main * ratio_hauteur;
     commande.couleur = couleur;
@@ -303,8 +305,14 @@ function optimiser() {
 }
 
 function valider_optimisation() {
-    localStorage.setItem('CH_listeCommandesAOptimiser', commandes_aOptimiser.toString());
-    location.href = './optimisation_reste.html';
+    // let liste_commandes = []
+    // for (let i=0; i<commandes_places.length; i++) {
+    //     liste_commandes.push(JSON.stringify(commandes_places[i]));
+    // }
+
+    localStorage.setItem('CH_commandes_places', JSON.stringify(commandes_places)); 
+    // localStorage.setItem('CH_commandes_places', liste_commandes.toString());
+    location.href = "./optimisation_reste.html";
 }
 
 function annuler_optimisation() {
