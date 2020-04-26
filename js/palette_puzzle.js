@@ -213,6 +213,9 @@ function creation_dessin_commande(commande) {
 // Affiche ou efface la commande (dans la section "affichage_palette") lors d'un clic sur une commande (dans la section "choix_commande").
 function ajout_suppression_commande(bouton, commande) {
     if (commande.estAffiche) {
+        if (commande.aOptimiser) {
+            document.getElementById("commande_"+commande.id).click();
+        }
         hauteur_actuelle -= commande.hauteur;
         // Suppression de la commande de la palette.
         for (let i=commandes_places.length-1; i>=0; i--) {
