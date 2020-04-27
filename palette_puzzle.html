@@ -14,6 +14,10 @@
     <section id="affichage_palette">
         <div id="barre_maximum"></div>
         <div id="barre_danger"></div>
+        <div class="dessin_commande" id="commande_reste">
+            <div class="dessin_colis" id="dessin_colis_reste"></div>
+            <div class="label_hauteur_commande" id="label_hauteur_commande_reste"></div>
+        </div>
     </section>    
 
     <div>
@@ -22,6 +26,7 @@
         <button id="voir_detail" onclick="voir_detail()">Détail</button>
     </div>
 
+    <div id="chargement"></div>
     <section id="voir_plus_opti"></section>
     <script src="js/algorithme_placement.js"></script>
     <script src="js/palette_puzzle.js"></script>

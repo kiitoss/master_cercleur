@@ -2,7 +2,7 @@ var AP_palette = []
 
 var AP_infos_colis = [
     new AP_type_colis("carton bois", 2, 2, 10.5, 8, "brown"),
-    new AP_type_colis("carton beige", 4, 2, 10.5, 8, "yellow"),
+    new AP_type_colis("carton beige", 2, 2, 10.5, 8, "yellow"),
     new AP_type_colis("IFCO", 4, 2, 10.5, 8, "green")
 ]
 

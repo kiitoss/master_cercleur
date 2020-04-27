@@ -70,7 +70,7 @@ function affiche_barres_max_danger() {
 
 
 // Objet commande, correspond à une commande (une quantité et un type de colis).
-function Commande(id, nb_colis, type_colis, nb_palettes, reste=false) {
+function Commande(id, nb_colis, type_colis, nb_palettes) {
     this.id = id;
 
     this.nb_colis = nb_colis;
@@ -87,9 +87,6 @@ function Commande(id, nb_colis, type_colis, nb_palettes, reste=false) {
     this.reste = 0;
 
     creer_bouton_commande(this);
-    if (reste) {
-        document.getElementById("ajout_suppr_commande_"+this.id).style.display = "none";
-    }
 }
 
 
@@ -172,7 +169,6 @@ function creation_dessin_commande(commande) {
         let main_part = document.createElement("div");
         main_part.setAttribute("class", "partie_dessin");
         main_part.style.height = commande.hauteur_main_redim+"px";
-        main_part.innerHTML = text;
         main_part.style.backgroundColor = commande.couleur;
     
         let reste = document.createElement("div");
@@ -181,6 +177,12 @@ function creation_dessin_commande(commande) {
         reste.style.width = (Math.min(window.innerHeight, window.innerWidth) * 0.7 * commande.ratio_reste)+"px";
         reste.style.backgroundColor = commande.couleur;
 
+        if (commande.hauteur_main_redim > 0) {
+            main_part.innerHTML = text;
+        }
+        else {
+            reste.innerHTML = text;
+        }
         dessin_colis.appendChild(reste);
         dessin_colis.appendChild(main_part);
     }
@@ -205,7 +207,7 @@ function creation_dessin_commande(commande) {
 
 
 // Affiche ou efface la commande (dans la section "affichage_palette") lors d'un clic sur une commande (dans la section "choix_commande").
-function ajout_suppression_commande(commande, auto=false, reste=false) {
+function ajout_suppression_commande(commande, auto=false) {
     let bouton = document.getElementById("ajout_suppr_commande_"+commande.id);
     if (commande.estAffiche) {
         hauteur_actuelle -= commande.hauteur;
@@ -227,23 +229,23 @@ function ajout_suppression_commande(commande, auto=false, reste=false) {
         // Ajout de la commande à la palette.
         let palette = document.getElementById("affichage_palette");
         let dessin_colis = document.getElementById("commande_"+commande.id);
-        dessin_colis.style.display = "block";
+        if (commande.hauteur > 0) {
+            dessin_colis.style.display = "block";
+        }
         commande.position_y = pos_derniere_commande - commande.hauteur_redimensionne - 2;
         dessin_colis.style.top = commande.position_y +"px";
         pos_derniere_commande = commande.position_y;
-        if (!reste) {
-            commandes_places.push(commande);
-        }
+        commandes_places.push(commande);
         
         hauteur_actuelle += commande.hauteur;
     }
     commande.estAffiche = !commande.estAffiche;
-    if (commande.estAffiche && !reste) {
+    if (commande.estAffiche) {
         bouton.style.backgroundColor = "green";
         bouton.style.borderColor = "green";
         bouton.style.color = "white";
     }
-    else if (!reste) {
+    else {
         bouton.style.backgroundColor = "white";
         bouton.style.borderColor = "white";
         bouton.style.color = "black";
@@ -285,7 +287,7 @@ function ajout_suppression_commande(commande, auto=false, reste=false) {
             document.body.classList.add("affichage_palette_ok");
         }
     }
-
+    
     document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_actuelle;
 
     if (!auto) {
@@ -298,16 +300,15 @@ function ajout_suppression_commande(commande, auto=false, reste=false) {
 
 
 function clique_optimisation(mouse_clique=true) {
-    document.getElementById("voir_plus_opti").innerHTML = "";
-    if (dessin_reste != null) {
-        ajout_suppression_commande(dessin_reste, true, true);
-        document.getElementById("choix_commandes").removeChild(document.getElementById("ajout_suppr_commande_"+dessin_reste.id));
-        document.getElementById("affichage_palette").removeChild(document.getElementById("commande_"+dessin_reste.id));
-        pos_derniere_commande += dessin_reste.hauteur_redimensionne;
-        dessin_reste = null;
-    }
+    // document.getElementById("chargement").style.display = "block";
+    // document.getElementById("chargement").style.top = "50%";
+    // document.getElementById("chargement").style.left = "50%";
 
+    document.getElementById("voir_plus_opti").innerHTML = "";
+    document.getElementById("commande_reste").style.display = "none";
+    document.getElementById("voir_plus_opti").innerHTML = "";
     
+
     if (mouse_clique) {
         optimisation_en_cours = !optimisation_en_cours;
     }
@@ -315,6 +316,10 @@ function clique_optimisation(mouse_clique=true) {
     let old_commande = [];
     for (let i=0; i<commandes_places.length; i++) {
         old_commande.push(commandes_places[i]);
+    }
+
+    for (let i=0; i<old_commande.length; i++) {
+        old_commande[i].modif_qte = 0;
     }
 
     for (let i=0; i<old_commande.length; i++) {
@@ -340,7 +345,6 @@ function clique_optimisation(mouse_clique=true) {
     }
 
 
-    // MODIFIER QTE PUIS EFFACER REDESSINER.
     // if (optimisation_en_cours && (hauteur_actuelle > hauteur_dangereuse)) {
     if (optimisation_en_cours) {
         old_commande = [];
@@ -352,7 +356,6 @@ function clique_optimisation(mouse_clique=true) {
             ajout_suppression_commande(old_commande[i], true);
             document.getElementById("affichage_palette").removeChild(document.getElementById("commande_"+old_commande[i].id));
             if (old_commande[i].reste != 0) {
-                console.log(old_commande[i].reste);
                 let ajoute = false;
                 for (let j=0; j<AP_liste_colis.length; j++) {
                     if (AP_liste_colis[j][1] == old_commande[i].type_colis) {
@@ -382,8 +385,8 @@ function clique_optimisation(mouse_clique=true) {
             AP_first_main();
             creation_top(AP_result);
         }
-        // console.log(AP_liste_colis);
     }
+    // document.getElementById("chargement").style.display = "none";
 }
 
 function voir_detail() {
@@ -471,6 +474,7 @@ function creation_top(palette) {
                     if (infos_colis[k][0] == colis[1]) {
                         if (infos_colis[k][1]*colis[2] > hauteur_max_reste) {
                             colis_reste = infos_colis[k];
+                            hauteur_max_reste = infos_colis[k][1]*colis[2];
                         }
                         couleur = infos_colis[k][3];
                         break;
@@ -489,21 +493,30 @@ function creation_top(palette) {
         new_colis.style.top = colis_palette[i][3]*ratio+"px";
         new_colis.style.left = colis_palette[i][4]*ratio+"px";
         new_colis.style.backgroundColor = colis_palette[i][7];
-        // new_colis.innerHTML = colis_palette[i][2]+ "-" + colis_palette[i][1];
         new_colis.innerHTML = colis_palette[i][2];
 
         dessin_palette.appendChild(new_colis);
     }
 
-    dessin_reste = new Commande("reste", colis_palette.length, colis_reste[0], 1, true);
-    dessin_reste.hauteur = colis_reste[1];
-    dessin_reste.hauteur_redimensionne = dessin_reste.hauteur * ratio_hauteur - 2;
-    console.log(dessin_reste.hauteur);
-    dessin_reste.hauteur_main = dessin_reste.hauteur;
-    dessin_reste.hauteur_main_redim = dessin_reste.hauteur * ratio_hauteur;
-    dessin_reste.reste = 0;
-    creation_dessin_commande(dessin_reste);
-    ajout_suppression_commande(dessin_reste, true, true);
+    dessin_reste = document.getElementById("commande_reste");
+    dessin_reste.style.display = "block";
+    console.log(dessin_reste.offsetHeight);
+    dessin_reste.style.height = (hauteur_max_reste*ratio_hauteur-2)+"px";
+    console.log(dessin_reste.offsetHeight);
+    console.log(hauteur_max_reste*ratio_hauteur-2);
+
+    dessin_colis_reste = document.getElementById("dessin_colis_reste");
+    dessin_colis_reste.innerHTML = "reste";
+    dessin_colis_reste.style.backgroundColor = "blue";
+    dessin_colis_reste.style.height = (hauteur_max_reste*ratio_hauteur-2)+"px";
+
+    document.getElementById("label_hauteur_commande_reste").innerHTML = "AAAAA";
+
+    console.log(pos_derniere_commande);
+    dessin_reste.style.top = (pos_derniere_commande-hauteur_max_reste*ratio_hauteur)+"px";
+
+    hauteur_actuelle += hauteur_max_reste;
+    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_actuelle;
 }
 
 
