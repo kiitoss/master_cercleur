@@ -21,6 +21,7 @@ if (!CH_commandes_places) {
 }
 else {
     commandes_places = CH_commandes_places;
+    console.log(commandes_places);
     main();
 }
 
