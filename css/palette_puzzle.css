@@ -123,11 +123,28 @@ body {
     width: min(10vw, 10vh);
 }
 
-
-
-#ligne_optimiser {
+#voir_detail {
     display: none;
+}
+
+
+
+#voir_plus_opti {
     position: absolute;
-    bottom: 0;
-    width: min(100vw, 100vh);
+    top: 50vh;
+    left: 0;
+    width: 20vw;
+    height: 20vh;
+    background-color: blue;
+}
+
+
+#dessin_palette_top {
+    border: 1px solid black;
+}
+
+.colis_top {
+    position: absolute;
+    border: 1px solid black;
+    color: black;
 }

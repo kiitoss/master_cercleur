@@ -1,12 +1,7 @@
-var AP_palette = [
-    ["0","0","0","0","0","0","0","0"],
-    ["0","0","0","0","0","0","0","0"],
-    ["0","0","0","0","0","0","0","0"],
-    ["0","0","0","0","0","0","0","0"]
-]
+var AP_palette = []
 
 var AP_infos_colis = [
-    new AP_type_colis("carton bois", 4, 2, 10.5, 8, "brown"),
+    new AP_type_colis("carton bois", 2, 2, 10.5, 8, "brown"),
     new AP_type_colis("carton beige", 4, 2, 10.5, 8, "yellow"),
     new AP_type_colis("IFCO", 4, 2, 10.5, 8, "green")
 ]
@@ -14,13 +9,7 @@ var AP_infos_colis = [
 // Création d'une copie de la AP_palette pour conserver la meilleure AP_palette pendant la recherche.
 var AP_palette_place_vide = 0;
 var AP_meilleur_palette = [];
-for (let j=0; j<AP_palette.length; j++) {
-    AP_meilleur_palette.push([]);
-    for (let i=0; i<AP_palette[j].length; i++) {
-        AP_meilleur_palette[j].push(0);
-        AP_palette_place_vide++;
-    }
-}
+
 
 
 // Initialisation des variables.
@@ -65,7 +54,7 @@ function AP_type_colis(nom, longueur, largeur, hauteur, nb_par_rang, couleur) {
 
 // Créé l'objet Colis.
 function AP_Colis(longueur, largeur, hauteur, superpose, nom_colis) {
-    this.id = superpose+"x"+nom_colis+"-("+AP_id+")";
+    this.id = [AP_id, nom_colis, superpose];
     AP_id++;
     this.longueur = longueur;
     this.largeur = largeur;
@@ -340,6 +329,37 @@ function AP_affichage_palette(placement_trouve=true) {
 
 
 function AP_first_main() {
+    AP_palette = [
+        ["0","0","0","0","0","0","0","0"],
+        ["0","0","0","0","0","0","0","0"],
+        ["0","0","0","0","0","0","0","0"],
+        ["0","0","0","0","0","0","0","0"]
+    ]
+    AP_palette_place_vide = 0;
+    AP_meilleur_palette = [];
+    for (let j=0; j<AP_palette.length; j++) {
+        AP_meilleur_palette.push([]);
+        for (let i=0; i<AP_palette[j].length; i++) {
+            AP_meilleur_palette[j].push(0);
+            AP_palette_place_vide++;
+        }
+    }
+
+    // Initialisation des variables.
+    AP_hauteur_max = 0;
+    AP_facteur_superposition = 1;
+    AP_id = 1;
+    // var AP_liste_colis = [[2, "carton bois"], [10, "IFCO"], [5, "carton beige"]];
+    // AP_liste_colis = [];
+    AP_liste_colis_modifie = [];
+
+
+    AP_LC = [];
+
+    AP_placement_ok = false;
+
+
+
     AP_creation_lc_modif();
     AP_tri_hauteur([]);
     AP_hauteur_max = AP_liste_colis_modifie[0][3];

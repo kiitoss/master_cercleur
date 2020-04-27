@@ -16,11 +16,14 @@
         <div id="barre_danger"></div>
     </section>    
 
-    <button id="bouton_optimiser" onclick="optimiser()">Optimiser</button>
-    <div id="ligne_optimiser">
-        <button id="valider_optimisation" onclick="annuler_optimisation()">Annuler</button>
-        <button id="annuler_optimisation" onclick="valider_optimisation()">Valider</button>
+    <div>
+        <input type="checkbox" id="checkbox_optimiser" name="checkbox_optimiser" onclick="clique_optimisation()">
+        <label for="checkbox_optimiser">Optimiser</label>
+        <button id="voir_detail" onclick="voir_detail()">Détail</button>
     </div>
+
+    <section id="voir_plus_opti"></section>
+    <script src="js/algorithme_placement.js"></script>
     <script src="js/palette_puzzle.js"></script>
 </body>
 </html>
