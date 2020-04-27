@@ -13,6 +13,10 @@ var infos_colis = [
     ["IFCO", 250, 2, "green"]
 ];
 
+
+document.getElementById("checkbox_optimiser").checked = false;
+
+
 // Récupération des variables stockées en local.
 var commande_recues = [];
 var CH_listeCommandes = localStorage.getItem('CH_listeCommandes');
@@ -196,7 +200,7 @@ function creation_dessin_commande(commande) {
 
 
 // Affiche ou efface la commande (dans la section "affichage_palette") lors d'un clic sur une commande (dans la section "choix_commande").
-function ajout_suppression_commande(commande) {
+function ajout_suppression_commande(commande, auto=false) {
     let bouton = document.getElementById("ajout_suppr_commande_"+commande.id);
     if (commande.estAffiche) {
         hauteur_actuelle -= commande.hauteur;
@@ -275,17 +279,20 @@ function ajout_suppression_commande(commande) {
     }
 
     document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_actuelle;
+
+    if (!auto) {
+        clique_optimisation(false);
+    }
 }
 
 
 
 
 
-function clique_optimisation() {
-    optimisation_en_cours = !optimisation_en_cours;
-    if ((commandes_places.length < 2) && optimisation_en_cours){
+function clique_optimisation(mouse_clique=true) {
+    if (mouse_clique) {
         optimisation_en_cours = !optimisation_en_cours;
-        return;
+        console.log(optimisation_en_cours);
     }
 
     let old_commande = [];
@@ -294,29 +301,25 @@ function clique_optimisation() {
     }
 
     for (let i=0; i<old_commande.length; i++) {
-        ajout_suppression_commande(old_commande[i]);
+        ajout_suppression_commande(old_commande[i], true);
         document.getElementById("affichage_palette").removeChild(document.getElementById("commande_"+old_commande[i].id));
     }
 
-    for (let i=0; i<old_commande.length; i++) {
-        console.log(old_commande[i]);
-    }
+
     if (optimisation_en_cours) {
         fusion_colis_identiques(old_commande);
     }
     else {
         reinitialise_commandes(old_commande);
     }
-    for (let i=0; i<old_commande.length; i++) {
-        console.log(old_commande[i]);
-    }
+
 
     for (let i=old_commande.length-1; i>-1; i--) {
         affecte_hauteurs_couleur(old_commande[i]);
         creation_dessin_commande(old_commande[i]);
     }
     for (let i=0; i<old_commande.length; i++) {
-        ajout_suppression_commande(old_commande[i]);
+        ajout_suppression_commande(old_commande[i], true);
     }
 }
 
@@ -337,16 +340,17 @@ function fusion_colis_identiques(old_commande) {
         if (parseInt(old_commande[i].reste) == 0) {
             continue;
         }
-        let type_carton = old_commande[i].type_carton;
+        let type_carton = old_commande[i].type_colis;
         for (let j=i+1; j<old_commande.length; j++) {
             if (parseInt(old_commande[j].reste) == 0) {
                 continue;
             }
-            if (old_commande[j].type_carton == type_carton) {
-                    old_commande[j].modif_qte += parseInt(old_commande[i].reste);
-                    old_commande[i].modif_qte += -parseInt(old_commande[i].reste);
-                    old_commande[j].reste += (parseInt(old_commande[i].reste) % parseInt(old_commande[j].nb_par_rang));
-                    old_commande[i].reste = 0;
+            console.log(type_carton);
+            if (old_commande[j].type_colis == type_carton) {
+                old_commande[j].modif_qte += parseInt(old_commande[i].reste);
+                old_commande[i].modif_qte += -parseInt(old_commande[i].reste);
+                old_commande[j].reste += (parseInt(old_commande[i].reste) % parseInt(old_commande[j].nb_par_rang));
+                old_commande[i].reste = 0;
             }
             if ((parseInt(old_commande[i].nb_colis) + parseInt(old_commande[i].modif_qte)) % parseInt(old_commande[i].nb_par_rang) == 0) {
                 break;
