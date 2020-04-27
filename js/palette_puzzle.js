@@ -7,12 +7,17 @@ var hauteur_actuelle = 0;
 var optimisation_en_cours = false;
 var commandes_aOptimiser = [];
 
+var hauteur_max = 265;
+var hauteur_dangereuse = 250;
+
 var infos_colis = [
     ["carton bois", 10.5, 8, "brown"],
     ["carton beige", 10, 8, "yellow"],
     ["IFCO", 250, 2, "green"]
 ];
 
+var AP_liste_colis = [];
+var AP_result = [];
 
 document.getElementById("checkbox_optimiser").checked = false;
 
@@ -57,8 +62,6 @@ function affiche_barres_max_danger() {
     document.getElementById("affichage_palette").style.height = hauteur_section+"px";
     pos_derniere_commande = document.getElementById("affichage_palette").offsetHeight;
 
-    let hauteur_max = 265;
-    let hauteur_dangereuse = 250;
     ratio_hauteur = hauteur_section*0.9 / hauteur_max;
 
     document.getElementById("barre_maximum").style.top = hauteur_section-hauteur_max*ratio_hauteur+"px";
@@ -124,7 +127,6 @@ function affecte_hauteurs_couleur(commande) {
     commande.nb_par_rang = parseInt(nb_par_rang);
     nb_par_rang = parseInt(nb_par_rang);
     commande.reste = (commande.nb_colis + commande.modif_qte) % nb_par_rang;
-    console.log(commande.modif_qte+"-"+commande.nb_colis+"-"+nb_par_rang+"-"+commande.reste);
     commande.hauteur_main = parseInt((commande.nb_colis + commande.modif_qte) / nb_par_rang) * hauteur;
     if (commande.reste != 0) {
         commande.hauteur = commande.hauteur_main + hauteur;
@@ -292,7 +294,6 @@ function ajout_suppression_commande(commande, auto=false) {
 function clique_optimisation(mouse_clique=true) {
     if (mouse_clique) {
         optimisation_en_cours = !optimisation_en_cours;
-        console.log(optimisation_en_cours);
     }
 
     let old_commande = [];
@@ -321,6 +322,31 @@ function clique_optimisation(mouse_clique=true) {
     for (let i=0; i<old_commande.length; i++) {
         ajout_suppression_commande(old_commande[i], true);
     }
+
+
+    // MODIFIER QTE PUIS EFFACER REDESSINER.
+    // if (optimisation_en_cours && (hauteur_actuelle > hauteur_dangereuse)) {
+    if (optimisation_en_cours) {
+        AP_liste_colis = [];
+        for (let i=0; i<commandes_places.length; i++) {
+            if (commandes_places[i].reste != 0) {
+                let ajoute = false;
+                for (let j=0; j<AP_liste_colis.length; j++) {
+                    if (AP_liste_colis[j][1] == commandes_places[i].type_colis) {
+                        AP_liste_colis[j][0] += commandes_places[i].reste;
+                        ajoute = true;
+                        break;
+                    }
+                }
+                if (!ajoute) {
+                    AP_liste_colis.push([commandes_places[i].reste, commandes_places[i].type_colis]);
+                }
+            }
+        }
+        AP_first_main();
+        console.log(AP_result);
+        // console.log(AP_liste_colis);
+    }
 }
 
 function voir_detail() {
@@ -345,7 +371,6 @@ function fusion_colis_identiques(old_commande) {
             if (parseInt(old_commande[j].reste) == 0) {
                 continue;
             }
-            console.log(type_carton);
             if (old_commande[j].type_colis == type_carton) {
                 old_commande[j].modif_qte += parseInt(old_commande[i].reste);
                 old_commande[i].modif_qte += -parseInt(old_commande[i].reste);
