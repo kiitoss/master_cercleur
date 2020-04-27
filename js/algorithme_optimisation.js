@@ -16,7 +16,6 @@ function Commande(nb_colis, type_colis, nb_palettes) {
     this.estAffiche = false;
     this.position_y = 0;
 
-    this.aOptimiser = false;
     this.hauteur_reste = 0;
 
     this.modif_qte = 0;
