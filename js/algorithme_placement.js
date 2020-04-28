@@ -1,28 +1,14 @@
-var AP_palette = []
-
-var AP_infos_colis = [
-    new AP_type_colis("carton bois", 2, 2, 10.5, 8, "brown"),
-    new AP_type_colis("carton beige", 2, 2, 10, 8, "yellow"),
-    new AP_type_colis("IFCO", 4, 2, 10.5, 8, "green")
-]
-
 // Création d'une copie de la AP_palette pour conserver la meilleure AP_palette pendant la recherche.
 var AP_palette_place_vide = 0;
 var AP_meilleur_palette = [];
-
-
 
 // Initialisation des variables.
 var AP_hauteur_max = 0;
 var AP_facteur_superposition = 1;
 var AP_id = 1;
-// var AP_liste_colis = [[2, "carton bois"], [10, "IFCO"], [5, "carton beige"]];
-// AP_liste_colis = [];
 var AP_liste_colis_modifie = [];
 
-
 var AP_LC = [];
-
 var AP_placement_ok = false;
 
 // Créé une copie de la liste des colis à partir de la liste originale.
@@ -31,9 +17,9 @@ function AP_creation_lc_modif() {
     for (let i=0; i<AP_liste_colis.length; i++) {
         let quantite = AP_liste_colis[i][0];
         let type_colis = null;
-        for (let j=0; j<AP_infos_colis.length; j++) {
-            if (AP_infos_colis[j].nom == AP_liste_colis[i][1]) {
-                type_colis = AP_infos_colis[j];
+        for (let j=0; j<liste_colis.length; j++) {
+            if (liste_colis[j].nom == AP_liste_colis[i][1]) {
+                type_colis = liste_colis[j];
                 break;
             }
         }
@@ -239,22 +225,6 @@ function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_i
     if (colis_places.length == AP_LC.length) {
         AP_palette = test_palette
         AP_placement_ok = true;
-        // let test_palette_place_vide = 0;
-        // for (let j=0; j<test_palette.length; j++) {
-        //     for (let i=0; i<test_palette[j].length; i++) {
-        //         if (test_palette[j][i] == 0) {
-        //             test_palette_place_vide++;
-        //         }
-        //     }
-        // }
-        // if (test_palette_place_vide == 0) {
-        //     AP_palette = test_palette;
-        //     AP_placement_ok = true;
-        // }
-        // else if (test_palette_place_vide < AP_palette_place_vide) {
-        //     AP_palette_place_vide = test_palette_place_vide;
-        //     AP_meilleur_palette = test_palette;
-        // }
     }
 
     if (!AP_placement_ok) {
@@ -327,16 +297,7 @@ function AP_affichage_palette(placement_trouve=true) {
     AP_result = AP_palette;
 }
 
-
-
-
 function AP_first_main() {
-    AP_palette = [
-        ["0","0","0","0","0","0","0","0"],
-        ["0","0","0","0","0","0","0","0"],
-        ["0","0","0","0","0","0","0","0"],
-        ["0","0","0","0","0","0","0","0"]
-    ]
     AP_palette_place_vide = 0;
     AP_meilleur_palette = [];
     for (let j=0; j<AP_palette.length; j++) {
@@ -351,23 +312,16 @@ function AP_first_main() {
     AP_hauteur_max = 0;
     AP_facteur_superposition = 1;
     AP_id = 1;
-    // var AP_liste_colis = [[2, "carton bois"], [10, "IFCO"], [5, "carton beige"]];
-    // AP_liste_colis = [];
     AP_liste_colis_modifie = [];
-
-
     AP_LC = [];
-
     AP_placement_ok = false;
-
-
 
     AP_creation_lc_modif();
     AP_tri_hauteur([]);
+
     AP_hauteur_max = AP_liste_colis_modifie[0][3];
-
     AP_LC = [];
-    AP_creation_LC();
 
+    AP_creation_LC();
     AP_main();
 }

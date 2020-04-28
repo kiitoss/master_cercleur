@@ -1,28 +1,13 @@
 var liste_commandes = [];
 var ratio_hauteur = 1;
-var couleurs = ["red", "blue", "green", "yellow"];
 var pos_derniere_commande;
 var commandes_places = [];
 var hauteur_actuelle = 0;
 var optimisation_en_cours = false;
-var commandes_aOptimiser = [];
 var dessin_reste = null;
 var hauteur_max = 260;
 var hauteur_dangereuse = 250;
 var hauteur_palette = 14.5;
-
-var infos_colis = [
-    ["carton bois", 10.5, 8, "brown"],
-    ["carton beige", 10, 8, "yellow"],
-    ["IFCO", 250, 2, "green"]
-];
-
-var liste_colis = [];
-for (let i=0; i<infos_colis.length; i++) {
-    liste_colis.push(new TypeColis(infos_colis[i][0], 2, 2, infos_colis[i][1], 8, infos_colis[i][3]));
-}
-// console.log(liste_colis);
-
 var AP_liste_colis = [];
 var AP_result = [];
 
@@ -60,7 +45,6 @@ function main() {
     document.getElementById("label_hauteur_actuelle").style.top = document.getElementById("choix_commandes").offsetHeight + "px"; 
 }
 
-
 // Redimensionne la section "affichage_palette" et positionne les barres "danger" et "maximum".
 function affiche_barres_max_danger() {
     // Affectation de la hauteur de "affichage_palette" en fonction de la hauteur de "choix_palette".
@@ -74,19 +58,6 @@ function affiche_barres_max_danger() {
     document.getElementById("barre_maximum").style.top = hauteur_section-hauteur_max*ratio_hauteur+"px";
     document.getElementById("barre_danger").style.top = hauteur_section-hauteur_dangereuse*ratio_hauteur+"px";
 }
-
-function TypeColis(nom, longueur, largeur, hauteur, nb_par_rang, couleur) {
-    this.nom = nom;
-    this.longueur = longueur;
-    this.largeur = largeur;
-    this.hauteur = hauteur;
-    this.nb_par_rang = nb_par_rang;
-    this.couleur = couleur;
-
-    this.aire = longueur * largeur;
-}
-
-
 
 // Objet commande, correspond à une commande (une quantité et un type de colis).
 function Commande(id, nb_colis, type_colis, nb_palettes) {
@@ -106,8 +77,6 @@ function Commande(id, nb_colis, type_colis, nb_palettes) {
     this.nb_colis = parseInt(nb_colis);
     this.nb_palettes = parseInt(nb_palettes);
 
-    // console.log(this.infos_colis);
-
     this.estAffiche = false;
     this.position_y = 0;
     this.couleur = "none";
@@ -123,15 +92,8 @@ function Commande(id, nb_colis, type_colis, nb_palettes) {
     this.delta_nb_palettes = 0;
     this.reste = 0;
 
-
-    // suppr
-    this.type_colis = type_colis;
-    this.delta_nb_palettes = 0;
-
-
     creer_bouton_commande(this);
 }
-
 
 // Créer le bouton correspondant à la commande (pendant la création de l'objet Commande).
 function creer_bouton_commande(commande) {
@@ -145,7 +107,6 @@ function creer_bouton_commande(commande) {
     nouvelle_commande.innerHTML = commande.nb_colis;
     choix_commandes.appendChild(nouvelle_commande);
 }
-
 
 // Affecte aux commande les hauteurs (normale et redimensionnées pour la page) et la couleur.
 function affecte_hauteurs_couleur(commande) {
@@ -184,7 +145,6 @@ function affecte_hauteurs_couleur(commande) {
     commande.couleur = commande.infos_colis.couleur;
 
 }
-
 
 // Création du div représentant la commande.
 function creation_dessin_commande(commande) {
@@ -246,10 +206,7 @@ function creation_dessin_commande(commande) {
         new_palette.style.height = commande.hauteur_palette_part * ratio_hauteur + "px";
         new_palette.style.top = commande.hauteur_total / 2 * ratio_hauteur + "px";
         dessin_colis.appendChild(new_palette);
-    }
-
-    // dessin_colis.style.height = commande.hauteur * ratio_hauteur + "px";
-    
+    }    
 
 
     let label_hauteur_commande = document.createElement("div");
@@ -262,7 +219,6 @@ function creation_dessin_commande(commande) {
     canvas_palette.appendChild(dessin_commande);
 }
 
-
 // Affiche ou efface la commande (dans la section "affichage_palette") lors d'un clic sur une commande (dans la section "choix_commande").
 function ajout_suppression_commande(commande, auto=false) {
     if (optimisation_en_cours && !auto) {
@@ -270,7 +226,6 @@ function ajout_suppression_commande(commande, auto=false) {
         document.getElementById("checkbox_optimiser").checked = false;
     }
     let bouton = document.getElementById("ajout_suppr_commande_"+commande.id);
-    // let hauteur_palettes_redim = (commande.nb_palettes+commande.delta_nb_palettes) * hauteur_palette * ratio_hauteur;
     if (commande.estAffiche) {
         // Suppression de la commande de la palette.
         for (let i=commandes_places.length-1; i>=0; i--) {
@@ -289,20 +244,14 @@ function ajout_suppression_commande(commande, auto=false) {
     else {
         // Ajout de la commande à la palette.
         let dessin_colis = document.getElementById("commande_"+commande.id);
-        // console.log(commande.hauteur_total);
-        // if (commande.nb_colis + commande.delta_nb_colis != 0) {
         if (commande.nb_colis + commande.delta_nb_colis != 0) {
             dessin_colis.style.display = "block";
         }
         commande.position_y = pos_derniere_commande - commande.hauteur_total * ratio_hauteur;
         dessin_colis.style.top = commande.position_y +"px";
         pos_derniere_commande = commande.position_y;
-        // }
 
         commandes_places.push(commande);
-
-        // console.log(pos_derniere_commande);
-        // console.log(document.getElementById("affichage_palette").offsetHeight - (commande.hauteur_total * ratio_hauteur));
     }
 
     commande.estAffiche = !commande.estAffiche;
@@ -317,14 +266,16 @@ function ajout_suppression_commande(commande, auto=false) {
         bouton.style.color = "black";
     }
 
-
     let hauteur_atteinte = 0;
     for (let i=0; i<commandes_places.length; i++) {
         hauteur_atteinte += commandes_places[i].hauteur_total;
     }
+    change_couleur_fond(hauteur_atteinte);
+}
+
+function change_couleur_fond(hauteur_atteinte) {
     document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte;
 
-    console.log(hauteur_atteinte+"-"+hauteur_max);
     if (hauteur_atteinte > hauteur_max) {
         if (document.body.classList.contains('affichage_palette_ok')) {
             document.body.classList.remove("affichage_palette_ok");
@@ -361,21 +312,7 @@ function ajout_suppression_commande(commande, auto=false) {
             document.body.classList.add("affichage_palette_ok");
         }
     }
-
-
-
-    // if (opti_running) {
-    //     clique_optimisation(true);
-    // }
-    // if ((optimisation_en_cours) && (!auto)) {
-    //     // reinitialise_commandes(commandes_places);
-    //     clique_optimisation(false);
-    // }
 }
-
-
-
-
 
 function clique_optimisation(mouse_clique=true) {
     document.getElementById("voir_plus_opti").innerHTML = "";
@@ -415,34 +352,30 @@ function clique_optimisation(mouse_clique=true) {
         document.getElementById("bouton_retour_arriere").onclick = function() {
             history.go(-1);
         }
-        // reinitialise_commandes(old_commande);
         document.getElementById("voir_detail").style.display = "none";
     }
 
 
 
-
-    // if (optimisation_en_cours && (hauteur_actuelle > hauteur_dangereuse)) {
-    if (optimisation_en_cours) {
-        // old_commande = [];
+    let hauteur_atteinte = 0;
+    for (let i=0; i<old_commande.length; i++) {
+        hauteur_atteinte += old_commande[i].hauteur_total;
+    }
+    if (optimisation_en_cours && (hauteur_atteinte > hauteur_dangereuse)) {
+    // if (optimisation_en_cours) {
         AP_liste_colis = [];
-        // for (let i=0; i<commandes_places.length; i++) {
-        //     old_commande.push(commandes_places[i]);
-        // }
         for (let i=0; i<old_commande.length; i++) {
-            // ajout_suppression_commande(old_commande[i], true);
-            // document.getElementById("affichage_palette").removeChild(document.getElementById("commande_"+old_commande[i].id));
             if (old_commande[i].reste != 0) {
                 let ajoute = false;
                 for (let j=0; j<AP_liste_colis.length; j++) {
-                    if (AP_liste_colis[j][1] == old_commande[i].type_colis) {
+                    if (AP_liste_colis[j][1] == old_commande[i].infos_colis.nom) {
                         AP_liste_colis[j][0] += old_commande[i].reste;
                         ajoute = true;
                         break;
                     }
                 }
                 if (!ajoute) {
-                    AP_liste_colis.push([old_commande[i].reste, old_commande[i].type_colis]);
+                    AP_liste_colis.push([old_commande[i].reste, old_commande[i].infos_colis.nom]);
                 }
 
                 old_commande[i].delta_nb_colis -= old_commande[i].reste;
@@ -478,7 +411,6 @@ function clique_optimisation(mouse_clique=true) {
 function voir_detail() {
     document.getElementById("section_detail").style.display = "block";
 }
-
 
 function creation_top(palette) {
     document.getElementById("bouton_retour_arriere").onclick = function() {
@@ -564,14 +496,14 @@ function creation_top(palette) {
                 }
                 let couleur = "none";
                 let hauteur_colis = 0;
-                for (let k=0; k<infos_colis.length; k++) {
-                    if (infos_colis[k][0] == colis[1]) {
-                        if (infos_colis[k][1]*colis[2] > hauteur_max_reste) {
-                            colis_reste = infos_colis[k];
-                            hauteur_max_reste = infos_colis[k][1]*colis[2];
+                for (let k=0; k<liste_colis.length; k++) {
+                    if (liste_colis[k].nom == colis[1]) {
+                        if (liste_colis[k].hauteur*colis[2] > hauteur_max_reste) {
+                            colis_reste = liste_colis[k];
+                            hauteur_max_reste = liste_colis[k].hauteur*colis[2];
                         }
-                        couleur = infos_colis[k][3];
-                        hauteur_colis = infos_colis[k][1];
+                        couleur = liste_colis[k].couleur;
+                        hauteur_colis = liste_colis[k].hauteur;
                         break;
                     }
                 }
@@ -600,7 +532,6 @@ function creation_top(palette) {
     let avance_left = 0;
 
     aire_palette = palette.length * palette[0].length;
-    console.log(aire_palette);
     for (let i=0; i<colis_palette.length; i++) {
         let new_colis = document.createElement("div");
         new_colis.setAttribute("class", "colis_top");
@@ -620,8 +551,6 @@ function creation_top(palette) {
         let new_colis_reste = document.createElement("div");
         new_colis_reste.setAttribute("class", "new_colis_reste");
         new_colis_reste.style.width = (colis_palette[i][5]*colis_palette[i][6] / aire_palette) * (Math.min(window.innerHeight, window.innerWidth) * 0.7)+"px";
-        // console.log(colis_palette[i][5]*colis_palette[i][6]);
-        // console.log(parseFloat(colis_palette[i][8]) * ratio_hauteur);
         new_colis_reste.style.height = (parseFloat(colis_palette[i][8] * colis_palette[i][2]) * ratio_hauteur)+"px";
         if (colis_palette[i][2] > 1) {
             let pos_top = (hauteur_max_reste - (parseFloat(colis_palette[i][8] * colis_palette[i][2])) * ratio_hauteur);
@@ -674,23 +603,20 @@ function creation_top(palette) {
     else {
         document.getElementById("label_hauteur_actuelle_voir_plus").style.backgroundColor = "red";
     }
+    change_couleur_fond(hauteur_atteinte);
 }
-
-
-
-
 
 function fusion_colis_identiques(old_commande) {
     for (let i=0; i<old_commande.length; i++) {
         if (parseInt(old_commande[i].reste) == 0) {
             continue;
         }
-        let type_carton = old_commande[i].type_colis;
+        let type_carton = old_commande[i].infos_colis.nom;
         for (let j=i+1; j<old_commande.length; j++) {
             if (parseInt(old_commande[j].reste) == 0) {
                 continue;
             }
-            if (old_commande[j].type_colis == type_carton) {
+            if (old_commande[j].infos_colis.nom == type_carton) {
                 if (old_commande[i].reste + old_commande[j].reste >= old_commande[i].infos_colis.nb_par_rang) {
                     old_commande[i].delta_nb_colis += (old_commande[i].infos_colis.nb_par_rang - old_commande[i].reste);
                     old_commande[j].delta_nb_colis -= (old_commande[i].infos_colis.nb_par_rang - old_commande[i].reste);
@@ -716,26 +642,12 @@ function fusion_colis_identiques(old_commande) {
     }
 }
 
-// function reinitialise_commandes(old_commande) {
-//     for (let i=0; i<old_commande.length; i++) {
-//         old_commande[i].delta_nb_colis = 0;
-//         old_commande[i].delta_nb_palettes = 0;
-//     }
-// }
-
-
-
-
-
-
-
-
 function creation_detail(restes) {
     let palette_hauteur = 14.5;
     let liste_restes = [];
     let hauteur_totale = 0;
-    for (let i=0; i<infos_colis.length; i++) {
-        liste_restes.push([infos_colis[i][0], infos_colis[i][1], 0]);
+    for (let i=0; i<liste_colis.length; i++) {
+        liste_restes.push([liste_colis[i].nom, liste_colis[i].hauteur, 0]);
     }
 
     // Récupération de la hauteur totale des palettes placées (sans les derniers rangs si l'on veut les optimiser).
