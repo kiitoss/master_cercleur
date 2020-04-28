@@ -124,26 +124,106 @@ body {
     top: 0;
     left: 0;
     width: min(10vw, 10vh);
+    z-index: 3;
 }
 
 #voir_detail {
     display: none;
+    position: absolute;
+    bottom: 0;
+    right: min(5vw, 5vh);
 }
+
+
+
+#section_detail {
+    width: min(100vw, 100vh);
+    height: 100vh;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: rgb(37, 34, 33);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#label_hauteur_actuelle_voir_plus {
+    border-radius: 10px;
+}
+
+#inventaire_reste {
+    position: absolute;
+    top: 0;
+    width: min(100vw, 100vh);
+    height: 45vh;
+    margin-top: 5vh;
+}
+
+#colis_restants {
+    height: 45vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
+    width: min(100vw, 100vh);
+}
+
+#liste_colis_retants {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    width: min(100vw, 100vh);
+}
+
+.colis_restant {
+    margin: auto;
+    overflow: hidden;
+    width: min(90vw, 90vh);
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+}
+
+.cellule {
+    flex: 1;
+    border-bottom: 1px solid white;
+    height: 5vh;
+    line-height: 5vh;
+}
+
+
+
+
+
+
 
 
 
 #voir_plus_opti {
     position: absolute;
     top: 50vh;
-    left: 0;
-    width: 20vw;
-    height: 20vh;
-    background-color: blue;
+    width: min(100vw, 100vh);
+    height: 50vh;
 }
 
 
 #dessin_palette_top {
     border: 1px solid black;
+    position: relative;
 }
 
 .colis_top {
@@ -154,11 +234,11 @@ body {
 
 
 
-#chargement {
+/* #chargement {
     position: absolute;
     display: none;
     width: 20px;
     height: 20px;
     border: 2px solid green;
     border-radius: 20px;
-}
+} */

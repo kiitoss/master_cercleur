@@ -9,6 +9,7 @@ var commandes_aOptimiser = [];
 var dessin_reste = null;
 var hauteur_max = 265;
 var hauteur_dangereuse = 250;
+var hauteur_palette = 14.5;
 
 var infos_colis = [
     ["carton bois", 10.5, 8, "brown"],
@@ -208,6 +209,11 @@ function creation_dessin_commande(commande) {
 
 // Affiche ou efface la commande (dans la section "affichage_palette") lors d'un clic sur une commande (dans la section "choix_commande").
 function ajout_suppression_commande(commande, auto=false) {
+    let opti_running = false;
+    if (optimisation_en_cours && !auto) {
+        opti_running = true;
+        clique_optimisation(true);
+    }
     let bouton = document.getElementById("ajout_suppr_commande_"+commande.id);
     if (commande.estAffiche) {
         hauteur_actuelle -= commande.hauteur;
@@ -293,6 +299,9 @@ function ajout_suppression_commande(commande, auto=false) {
     if (!auto) {
         clique_optimisation(false);
     }
+    if (opti_running) {
+        clique_optimisation(true);
+    }
 }
 
 
@@ -329,10 +338,15 @@ function clique_optimisation(mouse_clique=true) {
 
 
     if (optimisation_en_cours) {
+        parent = document.getElementById("liste_colis_retants");
+        while (parent.firstChild) {
+            parent.removeChild(parent.lastChild);
+        }
         fusion_colis_identiques(old_commande);
     }
     else {
         reinitialise_commandes(old_commande);
+        document.getElementById("voir_detail").style.display = "none";
     }
 
 
@@ -384,24 +398,31 @@ function clique_optimisation(mouse_clique=true) {
         if (AP_liste_colis.length != 0) {
             AP_first_main();
             creation_top(AP_result);
+            creation_detail(AP_liste_colis);
         }
     }
     // document.getElementById("chargement").style.display = "none";
 }
 
 function voir_detail() {
-    localStorage.setItem('CH_commandes_places', JSON.stringify(commandes_places)); 
-    location.href = "./optimisation_reste.html";
+    // localStorage.setItem('CH_commandes_places', JSON.stringify(commandes_places)); 
+    // location.href = "./optimisation_reste.html";
+    document.getElementById("section_detail").style.display = "block";
 }
 
 
 function creation_top(palette) {
+    document.getElementById("bouton_retour_arriere").onclick = function() {
+        document.getElementById("section_detail").style.display = "none";
+    }
     let hauteur_max_reste = 0;
     let colis_reste = null;
 
     let canvas_dessin = document.getElementById("voir_plus_opti");
-    let canvas_height = parseInt(canvas_dessin.offsetHeight);
-    let canvas_width = parseInt(canvas_dessin.offsetWidth);
+    document.getElementById("section_detail").style.display = "block";
+    let canvas_height = canvas_dessin.offsetHeight;
+    let canvas_width = canvas_dessin.offsetWidth;
+    document.getElementById("section_detail").style.display = "none";
 
     let palette_height = palette.length;
     let palette_width = palette[0].length;
@@ -442,8 +463,11 @@ function creation_top(palette) {
     dessin_palette.setAttribute("id", "dessin_palette_top");
     dessin_palette.style.width = palette_width*ratio + "px";
     dessin_palette.style.height = palette_height*ratio + "px";
+    dessin_palette.style.top = (canvas_height - palette_height*ratio) / 2 + "px";
+    dessin_palette.style.left = (canvas_width - palette_width*ratio) / 2 + "pxF";
 
     canvas_dessin.appendChild(dessin_palette);
+
 
 
     let colis_palette = [];
@@ -485,6 +509,8 @@ function creation_top(palette) {
         }
     }
 
+    hauteur_max_reste += hauteur_palette;
+
     for (let i=0; i<colis_palette.length; i++) {
         let new_colis = document.createElement("div");
         new_colis.setAttribute("class", "colis_top");
@@ -500,23 +526,30 @@ function creation_top(palette) {
 
     dessin_reste = document.getElementById("commande_reste");
     dessin_reste.style.display = "block";
-    console.log(dessin_reste.offsetHeight);
     dessin_reste.style.height = (hauteur_max_reste*ratio_hauteur-2)+"px";
-    console.log(dessin_reste.offsetHeight);
-    console.log(hauteur_max_reste*ratio_hauteur-2);
+
 
     dessin_colis_reste = document.getElementById("dessin_colis_reste");
     dessin_colis_reste.innerHTML = "reste";
     dessin_colis_reste.style.backgroundColor = "blue";
     dessin_colis_reste.style.height = (hauteur_max_reste*ratio_hauteur-2)+"px";
 
-    document.getElementById("label_hauteur_commande_reste").innerHTML = "AAAAA";
+    document.getElementById("label_hauteur_commande_reste").innerHTML = hauteur_max_reste;
 
-    console.log(pos_derniere_commande);
     dessin_reste.style.top = (pos_derniere_commande-hauteur_max_reste*ratio_hauteur)+"px";
 
     hauteur_actuelle += hauteur_max_reste;
     document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_actuelle;
+    document.getElementById("label_hauteur_actuelle_voir_plus").innerHTML = "Hauteur reste: "+hauteur_max_reste+" - Hauteur totale: "+hauteur_actuelle;
+    if (hauteur_actuelle < hauteur_dangereuse) {
+        document.getElementById("label_hauteur_actuelle_voir_plus").style.backgroundColor = "green";
+    }
+    else if (hauteur_actuelle < hauteur_max) {
+        document.getElementById("label_hauteur_actuelle_voir_plus").style.backgroundColor = "orange";
+    }
+    else {
+        document.getElementById("label_hauteur_actuelle_voir_plus").style.backgroundColor = "red";
+    }
 }
 
 
@@ -534,12 +567,18 @@ function fusion_colis_identiques(old_commande) {
                 continue;
             }
             if (old_commande[j].type_colis == type_carton) {
-                old_commande[j].modif_qte += parseInt(old_commande[i].reste);
-                old_commande[i].modif_qte += -parseInt(old_commande[i].reste);
-                old_commande[j].reste += (parseInt(old_commande[i].reste) % parseInt(old_commande[j].nb_par_rang));
-                old_commande[i].reste = 0;
+                if (old_commande[i].reste + old_commande[j].reste >= old_commande[i].nb_par_rang) {
+                    old_commande[i].modif_qte += (old_commande[i].nb_par_rang - old_commande[i].reste);
+                    old_commande[j].modif_qte -= (old_commande[i].nb_par_rang - old_commande[i].reste);
+                }
+                else {
+                    old_commande[i].modif_qte += old_commande[j].reste;
+                    old_commande[j].modif_qte -= old_commande[j].reste;
+                }
             }
-            if ((parseInt(old_commande[i].nb_colis) + parseInt(old_commande[i].modif_qte)) % parseInt(old_commande[i].nb_par_rang) == 0) {
+            old_commande[i].reste = (old_commande[i].modif_qte + old_commande[i].nb_colis) % old_commande[i].nb_par_rang;
+            old_commande[j].reste = (old_commande[j].modif_qte + old_commande[j].nb_colis) % old_commande[j].nb_par_rang;
+            if (old_commande[i].reste == 0) {
                 break;
             }
         }
@@ -550,4 +589,73 @@ function reinitialise_commandes(old_commande) {
     for (let i=0; i<old_commande.length; i++) {
         old_commande[i].modif_qte = 0;
     }
+}
+
+
+
+
+
+
+
+
+function creation_detail(restes) {
+    let palette_hauteur = 14.5;
+    let liste_restes = [];
+    let hauteur_totale = 0;
+    for (let i=0; i<infos_colis.length; i++) {
+        liste_restes.push([infos_colis[i][0], infos_colis[i][1], 0]);
+    }
+
+    // Récupération de la hauteur totale des palettes placées (sans les derniers rangs si l'on veut les optimiser).
+    for (let i=0; i<restes.length; i++) {
+        if (restes[i][0] != 0) {
+            for (let j=0; j<liste_restes.length; j++) {
+                if (liste_restes[j][0] == restes[i][1]) {
+                    liste_restes[j][2] += restes[i][0];
+                    break;
+                }
+            }
+
+        }
+    }
+
+
+    let liste_colis_retants = document.getElementById("liste_colis_retants");
+    let palette = document.createElement("li");
+    palette.setAttribute("class", "colis_restant");
+
+    let palette_nb = document.createElement("div");
+    palette_nb.setAttribute("class", "cellule");
+    palette_nb.innerHTML = "1 x palette";
+
+    let hauteur_ma_palette = document.createElement("div");
+    hauteur_ma_palette.setAttribute("class", "cellule");
+    hauteur_ma_palette.innerHTML = "hauteur: "+palette_hauteur;
+
+    palette.appendChild(palette_nb);
+    palette.appendChild(hauteur_ma_palette);
+
+    liste_colis_retants.append(palette);
+
+    for (let i=0; i<liste_restes.length; i++) {
+        if (liste_restes[i][2] > 0) {
+            let nouveau_colis_restant = document.createElement("li");
+            nouveau_colis_restant.setAttribute("class", "colis_restant");
+
+            let nombre_colis = document.createElement("div");
+            nombre_colis.setAttribute("class", "cellule");
+            nombre_colis.innerHTML = liste_restes[i][2]+" x "+liste_restes[i][0];
+
+            let hauteur_colis = document.createElement("div");
+            hauteur_colis.setAttribute("class", "cellule");
+            hauteur_colis.innerHTML = "hauteur: "+liste_restes[i][1];
+
+            nouveau_colis_restant.appendChild(nombre_colis);
+            nouveau_colis_restant.appendChild(hauteur_colis);
+
+            liste_colis_retants.append(nouveau_colis_restant);
+        }
+    }
+
+    document.getElementById("voir_detail").style.display = "block";
 }

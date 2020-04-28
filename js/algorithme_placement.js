@@ -2,7 +2,7 @@ var AP_palette = []
 
 var AP_infos_colis = [
     new AP_type_colis("carton bois", 2, 2, 10.5, 8, "brown"),
-    new AP_type_colis("carton beige", 2, 2, 10.5, 8, "yellow"),
+    new AP_type_colis("carton beige", 2, 2, 10, 8, "yellow"),
     new AP_type_colis("IFCO", 4, 2, 10.5, 8, "green")
 ]
 
@@ -237,22 +237,24 @@ function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_i
     colis_places.push(colis);
 
     if (colis_places.length == AP_LC.length) {
-        let test_palette_place_vide = 0;
-        for (let j=0; j<test_palette.length; j++) {
-            for (let i=0; i<test_palette[j].length; i++) {
-                if (test_palette[j][i] == 0) {
-                    test_palette_place_vide++;
-                }
-            }
-        }
-        if (test_palette_place_vide == 0) {
-            AP_palette = test_palette;
-            AP_placement_ok = true;
-        }
-        else if (test_palette_place_vide < AP_palette_place_vide) {
-            AP_palette_place_vide = test_palette_place_vide;
-            AP_meilleur_palette = test_palette;
-        }
+        AP_palette = test_palette
+        AP_placement_ok = true;
+        // let test_palette_place_vide = 0;
+        // for (let j=0; j<test_palette.length; j++) {
+        //     for (let i=0; i<test_palette[j].length; i++) {
+        //         if (test_palette[j][i] == 0) {
+        //             test_palette_place_vide++;
+        //         }
+        //     }
+        // }
+        // if (test_palette_place_vide == 0) {
+        //     AP_palette = test_palette;
+        //     AP_placement_ok = true;
+        // }
+        // else if (test_palette_place_vide < AP_palette_place_vide) {
+        //     AP_palette_place_vide = test_palette_place_vide;
+        //     AP_meilleur_palette = test_palette;
+        // }
     }
 
     if (!AP_placement_ok) {
