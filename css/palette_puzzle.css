@@ -98,6 +98,17 @@ body {
     color: black;
 }
 
+
+.palette {
+    background-color: greenyellow;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(min(70vw, 70vh));
+}
+
+
+
 .label_hauteur_commande {
     width: min(20vw, 20vh);
     display: inline-block;

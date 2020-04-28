@@ -147,13 +147,20 @@ function affecte_hauteurs_couleur(commande) {
 
 // Création du div représentant la commande.
 function creation_dessin_commande(commande) {
+    let hauteur_totale_commande = commande.hauteur + commande.nb_palettes * hauteur_palette;
     let palette = document.getElementById("affichage_palette");
 
     let dessin_commande = document.createElement("div");
     dessin_commande.setAttribute("class", "dessin_commande");
     dessin_commande.setAttribute("id", "commande_"+commande.id);
-    dessin_commande.style.height = commande.hauteur_redimensionne+"px";
+    dessin_commande.style.height = hauteur_totale_commande * ratio_hauteur+"px";
     dessin_commande.style.display = "none";
+
+    let dessin_palette = document.createElement("div");
+    dessin_palette.setAttribute("class", "palette");
+    dessin_palette.style.height = commande.nb_palettes * hauteur_palette * ratio_hauteur + 2 + "px";
+    dessin_commande.appendChild(dessin_palette);
+
 
 
     let dessin_colis = document.createElement("div");
@@ -169,7 +176,7 @@ function creation_dessin_commande(commande) {
     if (commande.reste != 0) {
         let main_part = document.createElement("div");
         main_part.setAttribute("class", "partie_dessin");
-        main_part.style.height = commande.hauteur_main_redim+"px";
+        main_part.style.height = commande.hauteur_main_redim + (commande.nb_palettes * hauteur_palette * ratio_hauteur) + "px";
         main_part.style.backgroundColor = commande.couleur;
     
         let reste = document.createElement("div");
@@ -192,13 +199,13 @@ function creation_dessin_commande(commande) {
         dessin_colis.style.backgroundColor = commande.couleur;
     }
 
-    dessin_colis.style.height = commande.hauteur_redimensionne+"px";
+    dessin_colis.style.height = hauteur_totale_commande+"px";
     
 
 
     let label_hauteur_commande = document.createElement("div");
     label_hauteur_commande.setAttribute("class", "label_hauteur_commande");
-    label_hauteur_commande.innerHTML = commande.hauteur;
+    label_hauteur_commande.innerHTML = hauteur_totale_commande;
 
     dessin_commande.appendChild(dessin_colis);
     dessin_commande.appendChild(label_hauteur_commande);
@@ -215,18 +222,19 @@ function ajout_suppression_commande(commande, auto=false) {
         clique_optimisation(true);
     }
     let bouton = document.getElementById("ajout_suppr_commande_"+commande.id);
+    let hauteur_palettes_redim = commande.nb_palettes * hauteur_palette * ratio_hauteur;
     if (commande.estAffiche) {
-        hauteur_actuelle -= commande.hauteur;
+        hauteur_actuelle -= (commande.hauteur + commande.nb_palettes * hauteur_palette);
         // Suppression de la commande de la palette.
         for (let i=commandes_places.length-1; i>=0; i--) {
             if (commandes_places[i].id == commande.id) {
-                pos_derniere_commande += commande.hauteur_redimensionne + 2;
+                pos_derniere_commande += commande.hauteur_redimensionne + hauteur_palettes_redim + 2;
                 document.getElementById("commande_"+commande.id).style.display = "none";
                 commandes_places.splice(i, 1);
                 break;
             }
             else {
-                commandes_places[i].position_y += commande.hauteur_redimensionne + 2
+                commandes_places[i].position_y += commande.hauteur_redimensionne + hauteur_palettes_redim + 2
                 document.getElementById("commande_"+commandes_places[i].id).style.top = commandes_places[i].position_y +"px";
             }
         }
@@ -238,12 +246,12 @@ function ajout_suppression_commande(commande, auto=false) {
         if (commande.hauteur > 0) {
             dessin_colis.style.display = "block";
         }
-        commande.position_y = pos_derniere_commande - commande.hauteur_redimensionne - 2;
+        commande.position_y = pos_derniere_commande - commande.hauteur_redimensionne - hauteur_palettes_redim - 2;
         dessin_colis.style.top = commande.position_y +"px";
         pos_derniere_commande = commande.position_y;
         commandes_places.push(commande);
         
-        hauteur_actuelle += commande.hauteur;
+        hauteur_actuelle += (commande.hauteur + commande.nb_palettes * hauteur_palette);
     }
     commande.estAffiche = !commande.estAffiche;
     if (commande.estAffiche) {
@@ -309,10 +317,6 @@ function ajout_suppression_commande(commande, auto=false) {
 
 
 function clique_optimisation(mouse_clique=true) {
-    // document.getElementById("chargement").style.display = "block";
-    // document.getElementById("chargement").style.top = "50%";
-    // document.getElementById("chargement").style.left = "50%";
-
     document.getElementById("voir_plus_opti").innerHTML = "";
     document.getElementById("commande_reste").style.display = "none";
     document.getElementById("voir_plus_opti").innerHTML = "";
@@ -345,6 +349,9 @@ function clique_optimisation(mouse_clique=true) {
         fusion_colis_identiques(old_commande);
     }
     else {
+        document.getElementById("bouton_retour_arriere").onclick = function() {
+            history.go(-1);
+        }
         reinitialise_commandes(old_commande);
         document.getElementById("voir_detail").style.display = "none";
     }
@@ -401,12 +408,9 @@ function clique_optimisation(mouse_clique=true) {
             creation_detail(AP_liste_colis);
         }
     }
-    // document.getElementById("chargement").style.display = "none";
 }
 
 function voir_detail() {
-    // localStorage.setItem('CH_commandes_places', JSON.stringify(commandes_places)); 
-    // location.href = "./optimisation_reste.html";
     document.getElementById("section_detail").style.display = "block";
 }
 
@@ -533,6 +537,7 @@ function creation_top(palette) {
     dessin_colis_reste.innerHTML = "reste";
     dessin_colis_reste.style.backgroundColor = "blue";
     dessin_colis_reste.style.height = (hauteur_max_reste*ratio_hauteur-2)+"px";
+
 
     document.getElementById("label_hauteur_commande_reste").innerHTML = hauteur_max_reste;
 
