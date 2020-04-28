@@ -7,7 +7,7 @@ var hauteur_actuelle = 0;
 var optimisation_en_cours = false;
 var commandes_aOptimiser = [];
 var dessin_reste = null;
-var hauteur_max = 265;
+var hauteur_max = 260;
 var hauteur_dangereuse = 250;
 var hauteur_palette = 14.5;
 
@@ -16,6 +16,12 @@ var infos_colis = [
     ["carton beige", 10, 8, "yellow"],
     ["IFCO", 250, 2, "green"]
 ];
+
+var liste_colis = [];
+for (let i=0; i<infos_colis.length; i++) {
+    liste_colis.push(new TypeColis(infos_colis[i][0], 2, 2, infos_colis[i][1], 8, infos_colis[i][3]));
+}
+// console.log(liste_colis);
 
 var AP_liste_colis = [];
 var AP_result = [];
@@ -69,23 +75,59 @@ function affiche_barres_max_danger() {
     document.getElementById("barre_danger").style.top = hauteur_section-hauteur_dangereuse*ratio_hauteur+"px";
 }
 
+function TypeColis(nom, longueur, largeur, hauteur, nb_par_rang, couleur) {
+    this.nom = nom;
+    this.longueur = longueur;
+    this.largeur = largeur;
+    this.hauteur = hauteur;
+    this.nb_par_rang = nb_par_rang;
+    this.couleur = couleur;
+
+    this.aire = longueur * largeur;
+}
+
+
 
 // Objet commande, correspond à une commande (une quantité et un type de colis).
 function Commande(id, nb_colis, type_colis, nb_palettes) {
-    this.id = id;
+    let colis_existe = false;
+    for (let i=0; i<liste_colis.length; i++) {
+        if (liste_colis[i].nom == type_colis) {
+            this.infos_colis = liste_colis[i];
+            colis_existe = true;
+            break;
+        }
+    }
+    if (!colis_existe) {
+        alert("Pas d'informations pour le colis: "+type_colis);
+    }
 
-    this.nb_colis = nb_colis;
-    this.type_colis = type_colis;
-    this.nb_palettes = nb_palettes;
+    this.id = parseInt(id);
+    this.nb_colis = parseInt(nb_colis);
+    this.nb_palettes = parseInt(nb_palettes);
+
+    // console.log(this.infos_colis);
 
     this.estAffiche = false;
     this.position_y = 0;
+    this.couleur = "none";
+
+    this.hauteur_main_part = 0;
+    this.hauteur_reste_part = 0;
+    this.hauteur_palette_part = 0;
+    this.hauteur_total = 0;
 
     this.hauteur_reste = 0;
 
-    this.modif_qte = 0;
-
+    this.delta_nb_colis = 0;
+    this.delta_nb_palettes = 0;
     this.reste = 0;
+
+
+    // suppr
+    this.type_colis = type_colis;
+    this.delta_nb_palettes = 0;
+
 
     creer_bouton_commande(this);
 }
@@ -107,152 +149,162 @@ function creer_bouton_commande(commande) {
 
 // Affecte aux commande les hauteurs (normale et redimensionnées pour la page) et la couleur.
 function affecte_hauteurs_couleur(commande) {
-    colis_existe = false;
-    for (let i=0; i<infos_colis.length; i++) {
-        if (infos_colis[i][0] == commande.type_colis) {
-            hauteur = infos_colis[i][1];
-            nb_par_rang = infos_colis[i][2];
-            couleur = infos_colis[i][3];
-            colis_existe = true;
-            break;
+    commande.reste = (commande.nb_colis + commande.delta_nb_colis) % commande.infos_colis.nb_par_rang;
+
+    if ((commande.nb_colis < commande.infos_colis.nb_par_rang * 2) && (commande.nb_palettes == 2)) {
+        commande.nb_palettes = 1;
+    }
+
+    if (commande.nb_colis + commande.delta_nb_colis == 0) {
+        commande.hauteur_palette_part = 0;
+        commande.hauteur_main_part = 0;
+        commande.hauteur_reste_part = 0;
+    }
+    else {
+        commande.hauteur_main_part = parseInt((commande.nb_colis + commande.delta_nb_colis) / commande.infos_colis.nb_par_rang) * commande.infos_colis.hauteur;
+        commande.hauteur_reste_part = 0;
+        if (commande.reste != 0) {
+            commande.hauteur_reste_part = commande.infos_colis.hauteur;
+        }
+
+        if (commande.nb_palettes + commande.delta_nb_palettes >= 1) {
+            commande.hauteur_palette_part = hauteur_palette;
+        }
+        else {
+            commande.hauteur_palette_part = 0;
         }
     }
 
-    if (!colis_existe) {
-        alert("Pas de hauteur pour le colis: "+commande.type_colis);
-        return 0;
+    let qte_palettes = commande.nb_palettes + commande.delta_nb_palettes;
+    if (qte_palettes == 2) {
+        commande.hauteur_main_part += hauteur_palette;
     }
+    commande.hauteur_total = commande.hauteur_palette_part + commande.hauteur_main_part + commande.hauteur_reste_part;
 
-    commande.nb_colis = parseInt(commande.nb_colis);
-    commande.modif_qte = parseInt(commande.modif_qte);
-    commande.nb_par_rang = parseInt(nb_par_rang);
-    nb_par_rang = parseInt(nb_par_rang);
-    commande.reste = (commande.nb_colis + commande.modif_qte) % nb_par_rang;
-    commande.hauteur_main = parseInt((commande.nb_colis + commande.modif_qte) / nb_par_rang) * hauteur;
-    if (commande.reste != 0) {
-        commande.hauteur = commande.hauteur_main + hauteur;
-        commande.ratio_reste = commande.reste / nb_par_rang;
-        commande.hauteur_reste = hauteur;
-    }
-    else {
-        commande.hauteur = commande.hauteur_main;
-    }
-
-    commande.hauteur_redimensionne = commande.hauteur * ratio_hauteur - 2;
-    commande.hauteur_main_redim = commande.hauteur_main * ratio_hauteur;
-    commande.couleur = couleur;
+    commande.couleur = commande.infos_colis.couleur;
 
 }
 
 
 // Création du div représentant la commande.
 function creation_dessin_commande(commande) {
-    let hauteur_totale_commande = commande.hauteur + commande.nb_palettes * hauteur_palette;
-    let palette = document.getElementById("affichage_palette");
+    let canvas_palette = document.getElementById("affichage_palette");
 
     let dessin_commande = document.createElement("div");
     dessin_commande.setAttribute("class", "dessin_commande");
     dessin_commande.setAttribute("id", "commande_"+commande.id);
-    dessin_commande.style.height = hauteur_totale_commande * ratio_hauteur+"px";
+    dessin_commande.style.height = commande.hauteur_total * ratio_hauteur + "px";
     dessin_commande.style.display = "none";
 
     let dessin_palette = document.createElement("div");
     dessin_palette.setAttribute("class", "palette");
-    dessin_palette.style.height = commande.nb_palettes * hauteur_palette * ratio_hauteur + 2 + "px";
+    dessin_palette.style.height = commande.hauteur_palette_part * ratio_hauteur + "px";
     dessin_commande.appendChild(dessin_palette);
 
 
 
     let dessin_colis = document.createElement("div");
     dessin_colis.setAttribute("class", "dessin_colis");
-    let text = commande.nb_colis;
-    if (commande.modif_qte != 0) {
-        text += " (";
-        if (commande.modif_qte > 0) {
-            text += "+";
+    let label = commande.nb_colis;
+    if (commande.delta_nb_colis != 0) {
+        label += " (";
+        if (commande.delta_nb_colis > 0) {
+            label += "+";
         }
-        text += commande.modif_qte+")";
+        label += commande.delta_nb_colis+")";
     }
     if (commande.reste != 0) {
         let main_part = document.createElement("div");
         main_part.setAttribute("class", "partie_dessin");
-        main_part.style.height = commande.hauteur_main_redim + (commande.nb_palettes * hauteur_palette * ratio_hauteur) + "px";
+        main_part.style.height = commande.hauteur_main_part * ratio_hauteur + "px";
         main_part.style.backgroundColor = commande.couleur;
     
-        let reste = document.createElement("div");
-        reste.setAttribute("class", "partie_dessin");
-        reste.style.height = (commande.hauteur_redimensionne - commande.hauteur_main_redim)+"px";
-        reste.style.width = (Math.min(window.innerHeight, window.innerWidth) * 0.7 * commande.ratio_reste)+"px";
-        reste.style.backgroundColor = commande.couleur;
+        let reste_part = document.createElement("div");
+        reste_part.setAttribute("class", "partie_dessin");
+        reste_part.style.height = commande.hauteur_reste_part * ratio_hauteur + "px";
+        reste_part.style.width = (Math.min(window.innerHeight, window.innerWidth) * 0.7 * (commande.reste / commande.infos_colis.nb_par_rang)) + "px";
+        reste_part.style.backgroundColor = commande.couleur;
 
-        if (commande.hauteur_main_redim > 0) {
-            main_part.innerHTML = text;
+        if (commande.hauteur_main_part > 0) {
+            main_part.innerHTML = label;
         }
         else {
-            reste.innerHTML = text;
+            reste_part.innerHTML = label;
         }
-        dessin_colis.appendChild(reste);
+        dessin_colis.appendChild(reste_part);
         dessin_colis.appendChild(main_part);
     }
     else {
-        dessin_colis.innerHTML = text;
+        dessin_colis.innerHTML = label;
+        dessin_colis.style.height = (commande.hauteur_main_part + commande.hauteur_reste_part) * ratio_hauteur + "px";
         dessin_colis.style.backgroundColor = commande.couleur;
     }
 
-    dessin_colis.style.height = hauteur_totale_commande+"px";
+    if ((commande.nb_palettes + commande.delta_nb_palettes == 2) && (commande.nb_colis + commande.delta_nb_colis > commande.infos_colis.nb_par_rang * 2)) {
+        let new_palette = document.createElement("div");
+        new_palette.setAttribute("class", "palette");
+        new_palette.style.height = commande.hauteur_palette_part * ratio_hauteur + "px";
+        new_palette.style.top = commande.hauteur_total / 2 * ratio_hauteur + "px";
+        dessin_colis.appendChild(new_palette);
+    }
+
+    // dessin_colis.style.height = commande.hauteur * ratio_hauteur + "px";
     
 
 
     let label_hauteur_commande = document.createElement("div");
     label_hauteur_commande.setAttribute("class", "label_hauteur_commande");
-    label_hauteur_commande.innerHTML = hauteur_totale_commande;
+    label_hauteur_commande.innerHTML = commande.hauteur_total;
 
     dessin_commande.appendChild(dessin_colis);
     dessin_commande.appendChild(label_hauteur_commande);
 
-    palette.appendChild(dessin_commande);
+    canvas_palette.appendChild(dessin_commande);
 }
 
 
 // Affiche ou efface la commande (dans la section "affichage_palette") lors d'un clic sur une commande (dans la section "choix_commande").
 function ajout_suppression_commande(commande, auto=false) {
-    let opti_running = false;
     if (optimisation_en_cours && !auto) {
-        opti_running = true;
         clique_optimisation(true);
+        document.getElementById("checkbox_optimiser").checked = false;
     }
     let bouton = document.getElementById("ajout_suppr_commande_"+commande.id);
-    let hauteur_palettes_redim = commande.nb_palettes * hauteur_palette * ratio_hauteur;
+    // let hauteur_palettes_redim = (commande.nb_palettes+commande.delta_nb_palettes) * hauteur_palette * ratio_hauteur;
     if (commande.estAffiche) {
-        hauteur_actuelle -= (commande.hauteur + commande.nb_palettes * hauteur_palette);
         // Suppression de la commande de la palette.
         for (let i=commandes_places.length-1; i>=0; i--) {
             if (commandes_places[i].id == commande.id) {
-                pos_derniere_commande += commande.hauteur_redimensionne + hauteur_palettes_redim + 2;
+                pos_derniere_commande += commande.hauteur_total * ratio_hauteur;
                 document.getElementById("commande_"+commande.id).style.display = "none";
                 commandes_places.splice(i, 1);
                 break;
             }
             else {
-                commandes_places[i].position_y += commande.hauteur_redimensionne + hauteur_palettes_redim + 2
+                commandes_places[i].position_y += commande.hauteur_total * ratio_hauteur;
                 document.getElementById("commande_"+commandes_places[i].id).style.top = commandes_places[i].position_y +"px";
             }
         }
     }
     else {
         // Ajout de la commande à la palette.
-        let palette = document.getElementById("affichage_palette");
         let dessin_colis = document.getElementById("commande_"+commande.id);
-        if (commande.hauteur > 0) {
+        // console.log(commande.hauteur_total);
+        // if (commande.nb_colis + commande.delta_nb_colis != 0) {
+        if (commande.nb_colis + commande.delta_nb_colis != 0) {
             dessin_colis.style.display = "block";
         }
-        commande.position_y = pos_derniere_commande - commande.hauteur_redimensionne - hauteur_palettes_redim - 2;
+        commande.position_y = pos_derniere_commande - commande.hauteur_total * ratio_hauteur;
         dessin_colis.style.top = commande.position_y +"px";
         pos_derniere_commande = commande.position_y;
+        // }
+
         commandes_places.push(commande);
-        
-        hauteur_actuelle += (commande.hauteur + commande.nb_palettes * hauteur_palette);
+
+        // console.log(pos_derniere_commande);
+        // console.log(document.getElementById("affichage_palette").offsetHeight - (commande.hauteur_total * ratio_hauteur));
     }
+
     commande.estAffiche = !commande.estAffiche;
     if (commande.estAffiche) {
         bouton.style.backgroundColor = "green";
@@ -265,7 +317,15 @@ function ajout_suppression_commande(commande, auto=false) {
         bouton.style.color = "black";
     }
 
-    if (pos_derniere_commande < document.getElementById("barre_maximum").offsetTop) {
+
+    let hauteur_atteinte = 0;
+    for (let i=0; i<commandes_places.length; i++) {
+        hauteur_atteinte += commandes_places[i].hauteur_total;
+    }
+    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte;
+
+    console.log(hauteur_atteinte+"-"+hauteur_max);
+    if (hauteur_atteinte > hauteur_max) {
         if (document.body.classList.contains('affichage_palette_ok')) {
             document.body.classList.remove("affichage_palette_ok");
         }
@@ -277,7 +337,7 @@ function ajout_suppression_commande(commande, auto=false) {
             document.body.classList.add("affichage_palette_sup_max");
         }
     }
-    else if (pos_derniere_commande < document.getElementById("barre_danger").offsetTop) {
+    else if (hauteur_atteinte > hauteur_dangereuse) {
         if (document.body.classList.contains('affichage_palette_ok')) {
             document.body.classList.remove("affichage_palette_ok");
         }
@@ -301,15 +361,16 @@ function ajout_suppression_commande(commande, auto=false) {
             document.body.classList.add("affichage_palette_ok");
         }
     }
-    
-    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_actuelle;
 
-    if (!auto) {
-        clique_optimisation(false);
-    }
-    if (opti_running) {
-        clique_optimisation(true);
-    }
+
+
+    // if (opti_running) {
+    //     clique_optimisation(true);
+    // }
+    // if ((optimisation_en_cours) && (!auto)) {
+    //     // reinitialise_commandes(commandes_places);
+    //     clique_optimisation(false);
+    // }
 }
 
 
@@ -323,16 +384,18 @@ function clique_optimisation(mouse_clique=true) {
     
 
     if (mouse_clique) {
+        if (commandes_places.length < 2 && !optimisation_en_cours) {
+            document.getElementById("checkbox_optimiser").checked = false;
+            return;
+        }
         optimisation_en_cours = !optimisation_en_cours;
     }
 
     let old_commande = [];
     for (let i=0; i<commandes_places.length; i++) {
         old_commande.push(commandes_places[i]);
-    }
-
-    for (let i=0; i<old_commande.length; i++) {
-        old_commande[i].modif_qte = 0;
+        old_commande[old_commande.length - 1].delta_nb_colis = 0;
+        old_commande[old_commande.length - 1].delta_nb_palettes = 0;
     }
 
     for (let i=0; i<old_commande.length; i++) {
@@ -352,30 +415,23 @@ function clique_optimisation(mouse_clique=true) {
         document.getElementById("bouton_retour_arriere").onclick = function() {
             history.go(-1);
         }
-        reinitialise_commandes(old_commande);
+        // reinitialise_commandes(old_commande);
         document.getElementById("voir_detail").style.display = "none";
     }
 
 
-    for (let i=old_commande.length-1; i>-1; i--) {
-        affecte_hauteurs_couleur(old_commande[i]);
-        creation_dessin_commande(old_commande[i]);
-    }
-    for (let i=0; i<old_commande.length; i++) {
-        ajout_suppression_commande(old_commande[i], true);
-    }
 
 
     // if (optimisation_en_cours && (hauteur_actuelle > hauteur_dangereuse)) {
     if (optimisation_en_cours) {
-        old_commande = [];
+        // old_commande = [];
         AP_liste_colis = [];
-        for (let i=0; i<commandes_places.length; i++) {
-            old_commande.push(commandes_places[i]);
-        }
+        // for (let i=0; i<commandes_places.length; i++) {
+        //     old_commande.push(commandes_places[i]);
+        // }
         for (let i=0; i<old_commande.length; i++) {
-            ajout_suppression_commande(old_commande[i], true);
-            document.getElementById("affichage_palette").removeChild(document.getElementById("commande_"+old_commande[i].id));
+            // ajout_suppression_commande(old_commande[i], true);
+            // document.getElementById("affichage_palette").removeChild(document.getElementById("commande_"+old_commande[i].id));
             if (old_commande[i].reste != 0) {
                 let ajoute = false;
                 for (let j=0; j<AP_liste_colis.length; j++) {
@@ -389,7 +445,7 @@ function clique_optimisation(mouse_clique=true) {
                     AP_liste_colis.push([old_commande[i].reste, old_commande[i].type_colis]);
                 }
 
-                old_commande[i].modif_qte -= old_commande[i].reste;
+                old_commande[i].delta_nb_colis -= old_commande[i].reste;
             }
         }
         
@@ -406,6 +462,15 @@ function clique_optimisation(mouse_clique=true) {
             AP_first_main();
             creation_top(AP_result);
             creation_detail(AP_liste_colis);
+        }
+    }
+    else {
+        for (let i=old_commande.length-1; i>-1; i--) {
+            affecte_hauteurs_couleur(old_commande[i]);
+            creation_dessin_commande(old_commande[i]);
+        }
+        for (let i=0; i<old_commande.length; i++) {
+            ajout_suppression_commande(old_commande[i], true);
         }
     }
 }
@@ -473,7 +538,7 @@ function creation_top(palette) {
     canvas_dessin.appendChild(dessin_palette);
 
 
-
+    let aire_palette = 0;
     let colis_palette = [];
     for (let j=0; j<palette.length; j++) {
         for (let i=0; i<palette[j].length; i++) {
@@ -498,6 +563,7 @@ function creation_top(palette) {
                     delta_y++;
                 }
                 let couleur = "none";
+                let hauteur_colis = 0;
                 for (let k=0; k<infos_colis.length; k++) {
                     if (infos_colis[k][0] == colis[1]) {
                         if (infos_colis[k][1]*colis[2] > hauteur_max_reste) {
@@ -505,16 +571,36 @@ function creation_top(palette) {
                             hauteur_max_reste = infos_colis[k][1]*colis[2];
                         }
                         couleur = infos_colis[k][3];
+                        hauteur_colis = infos_colis[k][1];
                         break;
                     }
                 }
-                colis_palette.push([colis[0], colis[1], colis[2], j, i, delta_x, delta_y, couleur]);
+                colis_palette.push([colis[0], colis[1], colis[2], j, i, delta_x, delta_y, couleur, hauteur_colis]);
+                aire_palette +=  delta_x * delta_y * colis[2];
             }
         }
     }
 
     hauteur_max_reste += hauteur_palette;
 
+    
+
+    dessin_reste = document.getElementById("commande_reste");
+    dessin_reste.style.display = "block";
+    dessin_reste.style.height = (hauteur_max_reste*ratio_hauteur)+"px";
+    dessin_reste.style.display = "flex";
+    dessin_reste.style.flexDirection = "row";
+
+
+    dessin_colis_reste = document.getElementById("dessin_colis_reste");
+    dessin_colis_reste.innerHTML = "";
+    dessin_colis_reste.style.height = (hauteur_max_reste*ratio_hauteur)+"px";
+
+
+    let avance_left = 0;
+
+    aire_palette = palette.length * palette[0].length;
+    console.log(aire_palette);
     for (let i=0; i<colis_palette.length; i++) {
         let new_colis = document.createElement("div");
         new_colis.setAttribute("class", "colis_top");
@@ -526,30 +612,63 @@ function creation_top(palette) {
         new_colis.innerHTML = colis_palette[i][2];
 
         dessin_palette.appendChild(new_colis);
+    
+
+
+
+
+        let new_colis_reste = document.createElement("div");
+        new_colis_reste.setAttribute("class", "new_colis_reste");
+        new_colis_reste.style.width = (colis_palette[i][5]*colis_palette[i][6] / aire_palette) * (Math.min(window.innerHeight, window.innerWidth) * 0.7)+"px";
+        // console.log(colis_palette[i][5]*colis_palette[i][6]);
+        // console.log(parseFloat(colis_palette[i][8]) * ratio_hauteur);
+        new_colis_reste.style.height = (parseFloat(colis_palette[i][8] * colis_palette[i][2]) * ratio_hauteur)+"px";
+        if (colis_palette[i][2] > 1) {
+            let pos_top = (hauteur_max_reste - (parseFloat(colis_palette[i][8] * colis_palette[i][2])) * ratio_hauteur);
+            new_colis_reste.style.display = "flex";
+            new_colis_reste.style.border = "none";
+            new_colis_reste.style.flexDirection = "column";
+            for (let nb=0; nb<colis_palette[i][2]; nb++) {
+                let sous_colis = document.createElement("div");
+                sous_colis.setAttribute("class", "sous_colis");
+                sous_colis.style.width = (colis_palette[i][5]*colis_palette[i][6] / aire_palette) * (Math.min(window.innerHeight, window.innerWidth) * 0.7)+"px";
+                sous_colis.style.flex = "1";
+                sous_colis.top = pos_top + "px";
+                pos_top -= parseFloat(colis_palette[i][8] * colis_palette[i][2]) * ratio_hauteur;
+                new_colis_reste.appendChild(sous_colis);
+            }
+        }
+        else {
+            new_colis_reste.style.top = (hauteur_max_reste - (parseFloat(colis_palette[i][8] * colis_palette[i][2])) * ratio_hauteur)+"px";
+        }
+        new_colis_reste.style.left = avance_left + "px";
+        new_colis_reste.style.backgroundColor = colis_palette[i][7];
+        avance_left += (colis_palette[i][5]*colis_palette[i][6] / aire_palette) * (Math.min(window.innerHeight, window.innerWidth) * 0.7);
+        dessin_colis_reste.appendChild(new_colis_reste);
     }
 
-    dessin_reste = document.getElementById("commande_reste");
-    dessin_reste.style.display = "block";
-    dessin_reste.style.height = (hauteur_max_reste*ratio_hauteur-2)+"px";
 
-
-    dessin_colis_reste = document.getElementById("dessin_colis_reste");
-    dessin_colis_reste.innerHTML = "reste";
-    dessin_colis_reste.style.backgroundColor = "blue";
-    dessin_colis_reste.style.height = (hauteur_max_reste*ratio_hauteur-2)+"px";
+    let palette_pour_reste = document.createElement("div");
+    palette_pour_reste.setAttribute("class", "palette");
+    palette_pour_reste.style.height = hauteur_palette * ratio_hauteur + "px";
+    dessin_colis_reste.appendChild(palette_pour_reste);
 
 
     document.getElementById("label_hauteur_commande_reste").innerHTML = hauteur_max_reste;
 
     dessin_reste.style.top = (pos_derniere_commande-hauteur_max_reste*ratio_hauteur)+"px";
-
-    hauteur_actuelle += hauteur_max_reste;
-    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_actuelle;
-    document.getElementById("label_hauteur_actuelle_voir_plus").innerHTML = "Hauteur reste: "+hauteur_max_reste+" - Hauteur totale: "+hauteur_actuelle;
-    if (hauteur_actuelle < hauteur_dangereuse) {
+    
+    let hauteur_atteinte = 0;
+    for (let i=0; i<commandes_places.length; i++) {
+        hauteur_atteinte += commandes_places[i].hauteur_total;
+    }
+    hauteur_atteinte += hauteur_max_reste;
+    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte;
+    document.getElementById("label_hauteur_actuelle_voir_plus").innerHTML = "Hauteur reste: "+hauteur_max_reste+" - Hauteur totale: "+hauteur_atteinte;
+    if (hauteur_atteinte < hauteur_dangereuse) {
         document.getElementById("label_hauteur_actuelle_voir_plus").style.backgroundColor = "green";
     }
-    else if (hauteur_actuelle < hauteur_max) {
+    else if (hauteur_atteinte < hauteur_max) {
         document.getElementById("label_hauteur_actuelle_voir_plus").style.backgroundColor = "orange";
     }
     else {
@@ -572,29 +691,37 @@ function fusion_colis_identiques(old_commande) {
                 continue;
             }
             if (old_commande[j].type_colis == type_carton) {
-                if (old_commande[i].reste + old_commande[j].reste >= old_commande[i].nb_par_rang) {
-                    old_commande[i].modif_qte += (old_commande[i].nb_par_rang - old_commande[i].reste);
-                    old_commande[j].modif_qte -= (old_commande[i].nb_par_rang - old_commande[i].reste);
+                if (old_commande[i].reste + old_commande[j].reste >= old_commande[i].infos_colis.nb_par_rang) {
+                    old_commande[i].delta_nb_colis += (old_commande[i].infos_colis.nb_par_rang - old_commande[i].reste);
+                    old_commande[j].delta_nb_colis -= (old_commande[i].infos_colis.nb_par_rang - old_commande[i].reste);
                 }
                 else {
-                    old_commande[i].modif_qte += old_commande[j].reste;
-                    old_commande[j].modif_qte -= old_commande[j].reste;
+                    old_commande[i].delta_nb_colis += old_commande[j].reste;
+                    old_commande[j].delta_nb_colis -= old_commande[j].reste;
                 }
             }
-            old_commande[i].reste = (old_commande[i].modif_qte + old_commande[i].nb_colis) % old_commande[i].nb_par_rang;
-            old_commande[j].reste = (old_commande[j].modif_qte + old_commande[j].nb_colis) % old_commande[j].nb_par_rang;
+            old_commande[i].reste = (old_commande[i].delta_nb_colis + old_commande[i].nb_colis) % old_commande[i].infos_colis.nb_par_rang;
+            old_commande[j].reste = (old_commande[j].delta_nb_colis + old_commande[j].nb_colis) % old_commande[j].infos_colis.nb_par_rang;
+            
+            if (old_commande[j].nb_colis + old_commande[j].delta_nb_colis == 0) {
+                old_commande[j].delta_nb_palettes = -old_commande[j].nb_palettes;
+            }
             if (old_commande[i].reste == 0) {
                 break;
             }
         }
+        if (old_commande[i].nb_colis + old_commande[i].delta_nb_colis == 0) {
+            old_commande[i].delta_nb_palettes = -old_commande[i].nb_palettes;
+        }
     }
 }
 
-function reinitialise_commandes(old_commande) {
-    for (let i=0; i<old_commande.length; i++) {
-        old_commande[i].modif_qte = 0;
-    }
-}
+// function reinitialise_commandes(old_commande) {
+//     for (let i=0; i<old_commande.length; i++) {
+//         old_commande[i].delta_nb_colis = 0;
+//         old_commande[i].delta_nb_palettes = 0;
+//     }
+// }
 
 
 

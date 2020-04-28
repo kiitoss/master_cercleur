@@ -100,11 +100,12 @@ body {
 
 
 .palette {
-    background-color: greenyellow;
+    background-color: rgb(71, 71, 160);
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
     position: absolute;
     bottom: 0;
     left: 0;
-    width: calc(min(70vw, 70vh));
+    width: min(70vw, 70vh);
 }
 
 
@@ -218,6 +219,12 @@ body {
 
 
 
+.sous_colis {
+    border: 1px solid black;
+}
+
+
+
 
 
 
@@ -243,6 +250,12 @@ body {
     color: black;
 }
 
+
+.new_colis_reste {
+    position: absolute;
+    top: 0;
+    border-left: 1px solid black;
+}
 
 
 /* #chargement {
