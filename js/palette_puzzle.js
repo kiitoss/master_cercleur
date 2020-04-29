@@ -347,9 +347,6 @@ function clique_optimisation(mouse_clique=true) {
         fusion_colis_identiques(old_commande);
     }
     else {
-        // document.getElementById("bouton_retour_arriere").onclick = function() {
-        //     history.go(-1);
-        // }
         document.getElementById("voir_detail").style.display = "none";
     }
 
@@ -415,6 +412,12 @@ function clique_optimisation(mouse_clique=true) {
 
 function voir_detail() {
     document.getElementById("section_detail").style.display = "block";
+    document.getElementById("bouton_retour_arriere").onclick = function() {
+        document.getElementById("section_detail").style.display = "none";
+        document.getElementById("bouton_retour_arriere").onclick = function() {
+            history.go(-1);
+        }
+    }
 }
 
 function creation_top(palette) {
