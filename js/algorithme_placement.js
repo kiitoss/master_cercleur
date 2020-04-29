@@ -1,6 +1,8 @@
 // Création d'une copie de la AP_palette pour conserver la meilleure AP_palette pendant la recherche.
 var AP_palette_place_vide = 0;
 var AP_meilleur_palette = [];
+var compteur_recursion = 0;
+var max_recursion = 100000;
 
 // Initialisation des variables.
 var AP_hauteur_max = 0;
@@ -210,6 +212,7 @@ function AP_place(ma_palette, index, pos_x, pos_y, liste_places) {
 
 // Place le colis sur tous les espaces possibles de la AP_palette, appel 'place()' à chaque placement valide.
 function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_index) {
+    compteur_recursion++;
     if ((test_palette[pos_y].length - pos_x < colis.longueur) || test_palette.length - pos_y < colis.largeur) {
         return false;
     }
@@ -228,6 +231,9 @@ function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_i
     }
 
     if (!AP_placement_ok) {
+        if (compteur_recursion > max_recursion) {
+            return;
+        }
         for (let j=0; j<test_palette.length - colis.largeur + 1; j++) {
             for (let i=0; i<test_palette[j].length - colis.longueur + 1; i++) {
                 free_position = true;

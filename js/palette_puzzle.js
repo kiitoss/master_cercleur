@@ -5,14 +5,10 @@ var commandes_places = [];
 var hauteur_actuelle = 0;
 var optimisation_en_cours = false;
 var dessin_reste = null;
-var hauteur_max = 260;
-var hauteur_dangereuse = 250;
-var hauteur_palette = 14.5;
 var AP_liste_colis = [];
 var AP_result = [];
 
 document.getElementById("checkbox_optimiser").checked = false;
-
 
 // Récupération des variables stockées en local.
 var commande_recues = [];
@@ -129,7 +125,7 @@ function affecte_hauteurs_couleur(commande) {
         }
 
         if (commande.nb_palettes + commande.delta_nb_palettes >= 1) {
-            commande.hauteur_palette_part = hauteur_palette;
+            commande.hauteur_palette_part = palette_infos.hauteur;
         }
         else {
             commande.hauteur_palette_part = 0;
@@ -138,7 +134,7 @@ function affecte_hauteurs_couleur(commande) {
 
     let qte_palettes = commande.nb_palettes + commande.delta_nb_palettes;
     if (qte_palettes == 2) {
-        commande.hauteur_main_part += hauteur_palette;
+        commande.hauteur_main_part += palette_infos.hauteur;
     }
     commande.hauteur_total = commande.hauteur_palette_part + commande.hauteur_main_part + commande.hauteur_reste_part;
 
@@ -213,7 +209,7 @@ function creation_dessin_commande(commande) {
 
     let label_hauteur_commande = document.createElement("div");
     label_hauteur_commande.setAttribute("class", "label_hauteur_commande");
-    label_hauteur_commande.innerHTML = commande.hauteur_total;
+    label_hauteur_commande.innerHTML = commande.hauteur_total.toFixed(2);
 
     dessin_commande.appendChild(dessin_colis);
     dessin_commande.appendChild(label_hauteur_commande);
@@ -276,7 +272,7 @@ function ajout_suppression_commande(commande, auto=false) {
 }
 
 function change_couleur_fond(hauteur_atteinte) {
-    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte;
+    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte.toFixed(2);
 
     if (hauteur_atteinte > hauteur_max) {
         if (document.body.classList.contains('affichage_palette_ok')) {
@@ -351,9 +347,9 @@ function clique_optimisation(mouse_clique=true) {
         fusion_colis_identiques(old_commande);
     }
     else {
-        document.getElementById("bouton_retour_arriere").onclick = function() {
-            history.go(-1);
-        }
+        // document.getElementById("bouton_retour_arriere").onclick = function() {
+        //     history.go(-1);
+        // }
         document.getElementById("voir_detail").style.display = "none";
     }
 
@@ -395,8 +391,15 @@ function clique_optimisation(mouse_clique=true) {
 
         if (AP_liste_colis.length != 0) {
             AP_first_main();
-            creation_top(AP_result);
-            creation_detail(AP_liste_colis);
+            if (AP_result.length != []) {
+                creation_top(AP_result);
+                creation_detail(AP_liste_colis);
+            }
+            else {
+                alert("Aucune solution trouvée.");
+                document.getElementById("checkbox_optimiser").checked = false;
+                clique_optimisation(true);
+            }
         }
     }
     else {
@@ -415,9 +418,6 @@ function voir_detail() {
 }
 
 function creation_top(palette) {
-    document.getElementById("bouton_retour_arriere").onclick = function() {
-        document.getElementById("section_detail").style.display = "none";
-    }
     let hauteur_max_reste = 0;
     let colis_reste = null;
 
@@ -515,7 +515,7 @@ function creation_top(palette) {
         }
     }
 
-    hauteur_max_reste += hauteur_palette;
+    hauteur_max_reste += palette_infos.hauteur;
 
     
 
@@ -582,7 +582,7 @@ function creation_top(palette) {
     let palette_pour_reste = document.createElement("div");
     palette_pour_reste.setAttribute("class", "palette");
     palette_pour_reste.style.backgroundColor = palette_infos.couleur;
-    palette_pour_reste.style.height = hauteur_palette * ratio_hauteur + "px";
+    palette_pour_reste.style.height = palette_infos.hauteur * ratio_hauteur + "px";
     dessin_colis_reste.appendChild(palette_pour_reste);
 
 
@@ -595,8 +595,8 @@ function creation_top(palette) {
         hauteur_atteinte += commandes_places[i].hauteur_total;
     }
     hauteur_atteinte += hauteur_max_reste;
-    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte;
-    document.getElementById("label_hauteur_actuelle_voir_plus").innerHTML = "Hauteur reste: "+hauteur_max_reste+" - Hauteur totale: "+hauteur_atteinte;
+    document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte.toFixed(2);
+    document.getElementById("label_hauteur_actuelle_voir_plus").innerHTML = "Hauteur reste: "+hauteur_max_reste.toFixed(2)+" - Hauteur totale: "+hauteur_atteinte.toFixed(2);
     if (hauteur_atteinte < hauteur_dangereuse) {
         document.getElementById("label_hauteur_actuelle_voir_plus").style.backgroundColor = "green";
     }

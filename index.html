@@ -10,6 +10,7 @@
     <h1 id="titre_page">Master Cerclage</h1>
     <button id="bouton_erase" onclick="erase_commandes()"></button>
     <button id="bouton_parametre" onclick="ouvre_param()"></button>
+    <!-- <p id="hauteur_avant_valid"></p> -->
     <section id="main">
         <div id="inserer_valider">
             <button class="btn_ajouter" onclick="creation_nouvelle_commande()">Nouvelle commande</button>
@@ -30,6 +31,16 @@
         <div id="header_param">
             <button class="btn_ajouter" id="ajouter_colis" onclick="creation_colis()">Ajouter colis</button>
             <button class="btn_valider" id="valider_param" onclick="valider_parametres()">Valider</button>
+        </div>
+        <div id="param_hauteurs">
+            <div>
+                <p class="label_hauteur">Hauteur max: </p>
+                <input type="number" class="data_hauteur" id="data_hauteur_max" step="0.01" onchange="change_hauteur()"/>
+            </div>
+            <div>
+                <p class="label_hauteur">Hauteur dangereuse: </p>
+                <input type="number" class="data_hauteur" id="data_hauteur_dangereuse" step="0.01" onchange="change_hauteur()"/>
+            </div>
         </div>
         <ul id="param_liste_colis"></ul>
     </section>

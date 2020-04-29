@@ -43,12 +43,23 @@ body {
     line-height: 7vh;
     width: min(70vw, 70vh);
     font-size: x-large;
-    margin: auto auto 5vh;
+    margin: auto auto 7vh;
     border-top: thick double white;
     border-bottom: thick double white;
     animation-duration: 2s;
     animation-name: animation_entree;
 }
+
+/* #hauteur_avant_valid {
+    margin: auto;
+    margin-top: 2vh;
+    margin-bottom: 5vh;
+    width: min(70vw, 70vh);
+    line-height: 5vh;
+    height: 5vh;
+    animation-duration: 4s;
+    animation-name: animation_entree;
+} */
 
 
 #main {
@@ -189,6 +200,7 @@ body {
     width: 10vh;
     height: 10vh;
     border-radius: 10px;
+    color: white;
 }
 
 .ac_nb_palettes {
@@ -197,6 +209,7 @@ body {
     border-radius: 5px;
     width: min(4vw, 4vh);
     height: 4vh;
+    color: white;
 }
 
 
@@ -429,4 +442,31 @@ body {
     position: absolute;
     top: 0;
     left: 0;
+    animation-duration: 4s;
+    animation-name: apparition_entree;
+}
+
+#param_hauteurs {
+    margin-top: 5vh;
+}
+
+#param_hauteurs>div {
+    display: flex;
+    flex-direction: row;
+    width: 75%;
+    margin-right: auto;
+}
+
+.label_hauteur {
+    flex: 2;
+    text-align: right;
+    height: 2vh;
+}
+
+.data_hauteur {
+    flex: 1;
+    text-align: center;
+    height: 2vh;
+    margin-left: 5px;
+    font-size: x-small;
 }

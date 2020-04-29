@@ -92,7 +92,6 @@ function ajout_commande() {
     status_creation_commande.id_commande += 1;
 }
 
-
 // Valide ou annule l'ajout d'une nouvelle commande.
 function terminer_ajout(ajout_valide) {
     if (ajout_valide) {
@@ -192,7 +191,6 @@ function check_valide_input_colis(objet) {
         objet.value = maximum;
     }
 }
-
 
 // Création de l'interface pour choisir le type de colis de la commande.
 function creation_commande_p2(commande_id=null) {
@@ -316,7 +314,6 @@ function creation_commande_p3(commande_id=null) {
     }
 }
 
-
 function change_background_bouton(id_bouton, nb_palettes) {
     bouton = document.getElementById(id_bouton);
     if (nb_palettes == 0) {
@@ -333,6 +330,9 @@ function change_background_bouton(id_bouton, nb_palettes) {
 function valider() {
     let liste_commandes = [];
     lignes_commandes = document.getElementsByClassName("ligne_commande");
+    if (lignes_commandes.length == 0) {
+        return;
+    }
     for (let i=0; i<lignes_commandes.length; i++) {
         let id_commande = parseInt(lignes_commandes[i].getAttribute("id").substr(3));
         let nb_colis_commande = parseInt(document.getElementById("nb_colis_commande_"+id_commande).value);
@@ -344,10 +344,8 @@ function valider() {
     location.href = "./palette_puzzle.html";
 }
 
-
-
-
 function ouvre_param(premiere=true) {
+    document.getElementById("param_hauteurs").style.display = "block";
     param_liste_colis = document.getElementById("param_liste_colis");
     while (param_liste_colis.firstChild) {
         param_liste_colis.removeChild(param_liste_colis.lastChild);
@@ -362,7 +360,12 @@ function ouvre_param(premiere=true) {
         document.getElementById('parametres').style.display = 'block';
         document.getElementById("valider_param").style.backgroundColor = "grey";
         document.getElementById("valider_param").style.borderColor = "grey";
+        hauteur_max = localStorage.getItem('CH_hauteur_max');
+        hauteur_dangereuse = localStorage.getItem('CH_hauteur_dangereuse');
     }
+
+    document.getElementById("data_hauteur_max").value = hauteur_max;
+    document.getElementById("data_hauteur_dangereuse").value = hauteur_dangereuse;
 
     if (param_modifie) {
         document.getElementById("valider_param").style.backgroundColor = "green";
@@ -398,7 +401,6 @@ function ouvre_param(premiere=true) {
         liste_colis[i].nb_par_rang = parseInt(palette_infos.longueur / liste_colis[i].longueur) * parseInt(palette_infos.largeur / liste_colis[i].largeur);
     }
 }
-
 
 function param_ajouter_colis(element, palette=false) {
     document.getElementById("param_bouton_retour_arriere").onclick = function() {
@@ -534,9 +536,8 @@ function param_ajouter_colis(element, palette=false) {
     param_liste_colis.appendChild(nouveau_colis);
 }
 
-
-
 function modifie_valeur_titre(element) {
+    document.getElementById("param_hauteurs").style.display = "none";
     document.getElementById("param_bouton_retour_arriere").onclick = function() {
         ouvre_param(false);
     }
@@ -567,9 +568,26 @@ function modifie_valeur_titre(element) {
     btn_valider.setAttribute("id", "param_valide_change");
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
-        param_modifie = true;
-        element.nom = document.getElementById("input_change").value;
-        ouvre_param(false);
+        if (element.nom != document.getElementById("input_change").value) {
+            let exist_deja = false;
+            for (let i=0; i<liste_colis.length; i++) {
+                if (liste_colis[i].nom == document.getElementById("input_change").value) {
+                    exist_deja = true;
+                    break;
+                }
+            }
+            if (exist_deja) {
+                alert("Ce nom de colis est déjà pris.");
+            }
+            else {
+                param_modifie = true;
+                element.nom = document.getElementById("input_change").value;
+                ouvre_param(false);
+            }
+        }
+        else {
+            ouvre_param(false);
+        }
     }
 
     param_liste_colis.appendChild(titre_change);
@@ -583,6 +601,7 @@ function modifie_valeur_titre(element) {
 }
 
 function modifie_valeur_param(element, type_elem, variable) {
+    document.getElementById("param_hauteurs").style.display = "none";
     let data;
     if (variable == "longueur") {
         data = element.longueur;
@@ -631,17 +650,33 @@ function modifie_valeur_param(element, type_elem, variable) {
     btn_valider.setAttribute("id", "param_valide_change");
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
-        param_modifie = true;
         if (variable == "longueur") {
-            element.longueur = document.getElementById("input_change").value;
+            element.longueur = parseInt(document.getElementById("input_change").value);
+            if (element.longueur > palette_infos.longueur) {
+                alert("Vous avez rentré une plus grande longueur que la palette ("+palette_infos.longueur+"u)");
+                modifie_valeur_param(element, type_elem, variable)
+            }
+            else {
+                param_modifie = true;
+                ouvre_param(false);
+            }
         }
         else if (variable == "largeur") {
-            element.largeur = document.getElementById("input_change").value;
+            element.largeur = parseInt(document.getElementById("input_change").value);
+            if (element.largeur > palette_infos.largeur) {
+                alert("Vous avez rentré une plus grande largeur que la palette ("+palette_infos.largeur+"u)");
+                modifie_valeur_param(element, type_elem, variable)
+            }
+            else {
+                param_modifie = true;
+                ouvre_param(false);
+            }
         }
         else {
-            element.hauteur = document.getElementById("input_change").value;
+            element.hauteur = parseFloat(document.getElementById("input_change").value);
+            param_modifie = true;
+            ouvre_param(false);
         }
-        ouvre_param(false);
     }
 
     param_liste_colis.appendChild(titre_change);
@@ -656,6 +691,7 @@ function modifie_valeur_param(element, type_elem, variable) {
 }
 
 function creation_colis() {
+    document.getElementById("param_hauteurs").style.display = "none";
     document.getElementById("param_bouton_retour_arriere").onclick = function() {
         ouvre_param(false);
     }
@@ -689,7 +725,20 @@ function creation_colis_p1(nouveau_colis) {
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
         nouveau_colis.nom = document.getElementById("input_change").value;
-        creation_colis_p2(nouveau_colis);
+        let exist_deja = false;
+        for (let i=0; i<liste_colis.length; i++) {
+            if (liste_colis[i].nom == nouveau_colis.nom) {
+                exist_deja = true;
+                break;
+            }
+        }
+        if (exist_deja) {
+            alert("Ce nom de colis est déjà pris.");
+            creation_colis_p1(nouveau_colis);
+        }
+        else {
+            creation_colis_p2(nouveau_colis);
+        }
     }
 
     param_liste_colis.appendChild(titre_change);
@@ -699,10 +748,8 @@ function creation_colis_p1(nouveau_colis) {
     document.getElementById("input_change").focus()
 }
 
-
 function creation_colis_p2(nouveau_colis) {
     let couleur = "#ff0000";
-    let liste_choix = ["Longueur: (u)", "Largeur: (u)", "Hauteur: (cm)"];
     param_liste_colis = document.getElementById("param_liste_colis");
     while (param_liste_colis.firstChild) {
         param_liste_colis.removeChild(param_liste_colis.lastChild);
@@ -772,11 +819,23 @@ function creation_colis_p3(nouveau_colis, i) {
     btn_valider.onclick = function() {
         if (i==0) {
             nouveau_colis.longueur = parseInt(document.getElementById("input_change").value);
-            creation_colis_p3(nouveau_colis, (i+1));
+            if (nouveau_colis.longueur > palette_infos.longueur) {
+                alert("Vous avez rentré une plus grande longueur que la palette ("+palette_infos.longueur+"u)");
+                creation_colis_p3(nouveau_colis, i);
+            }
+            else {
+                creation_colis_p3(nouveau_colis, (i+1));
+            }
         }
         else if (i==1) {
             nouveau_colis.largeur = parseInt(document.getElementById("input_change").value);
-            creation_colis_p3(nouveau_colis, (i+1));
+            if (nouveau_colis.largeur > palette_infos.largeur) {
+                alert("Vous avez rentré une plus grande largeur que la palette ("+palette_infos.largeur+"u)");
+                creation_colis_p3(nouveau_colis, i);
+            }
+            else {
+                creation_colis_p3(nouveau_colis, (i+1));
+            }
         }
         else if (i==2) {
             nouveau_colis.hauteur = parseFloat(document.getElementById("input_change").value);
@@ -799,17 +858,37 @@ function valider_parametres() {
         document.getElementById('parametres').style.display = 'none';
         return;
     }
+    palette_infos.longueur = parseInt(palette_infos.longueur);
+    palette_infos.largeur = parseInt(palette_infos.largeur);
+    palette_infos.hauteur = parseFloat(palette_infos.hauteur);
+    for (let i=0; i<liste_colis.length; i++) {
+        liste_colis[i].longueur = parseInt(liste_colis[i].longueur);
+        liste_colis[i].largeur = parseInt(liste_colis[i].largeur);
+        liste_colis[i].hauteur = parseFloat(liste_colis[i].hauteur);
+        liste_colis[i].nb_par_rang = parseInt(palette_infos.longueur / liste_colis[i].longueur) * parseInt(palette_infos.largeur / liste_colis[i].largeur);
+    }
     localStorage.setItem('CH_palette_infos', JSON.stringify(palette_infos));
     localStorage.setItem('CH_liste_colis', JSON.stringify(liste_colis));
+
+    hauteur_max = parseFloat(document.getElementById("data_hauteur_max").value);
+    hauteur_dangereuse = parseFloat(document.getElementById("data_hauteur_dangereuse").value);
+    localStorage.setItem("CH_hauteur_max", hauteur_max);
+    localStorage.setItem("CH_hauteur_dangereuse", hauteur_dangereuse);
+
     location.href = "./index.html";
 }
 
-
-
-
 function erase_commandes() {
     main = document.getElementById("main");
-    while (main.firstChild.getAttribute("id") != "inserer_valider") {
+    while (main.firstChild.id != "inserer_valider") {
         main.removeChild(main.firstChild);
     }
+}
+
+function change_hauteur() {
+    param_modifie = true;
+    hauteur_max = parseFloat(document.getElementById("data_hauteur_max").value);
+    hauteur_dangereuse = parseFloat(document.getElementById("data_hauteur_dangereuse").value);
+    document.getElementById("valider_param").style.backgroundColor = "green";
+    document.getElementById("valider_param").style.borderColor = "green";
 }
