@@ -1,4 +1,7 @@
-var choix_type_colis = ["carton bois", "carton beige", "IFCO"];
+var choix_type_colis = [];
+for (let i=0; i<liste_colis.length; i++) {
+    choix_type_colis.push(liste_colis[i].nom);
+}
 var status_creation_commande = new Object();
 status_creation_commande.id_commande = 0;
 status_creation_commande.estOuvert = false;
@@ -276,7 +279,7 @@ function creation_commande_p3(commande_id=null) {
     let main_part = document.getElementById("ac_main_ajout_commande");
 
     // Création des boutons pour choisir le nombre de palettes.
-    for (let i=0; i<3; i++) {
+    for (let i=0; i<=max_palettes; i++) {
         let nouveau_bouton = document.createElement("button");
         nouveau_bouton.setAttribute("class", "ac_bouton_palette");
         nouveau_bouton.innerHTML = i;
