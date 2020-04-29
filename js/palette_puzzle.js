@@ -158,6 +158,7 @@ function creation_dessin_commande(commande) {
 
     let dessin_palette = document.createElement("div");
     dessin_palette.setAttribute("class", "palette");
+    dessin_palette.style.backgroundColor = palette_infos.couleur;
     dessin_palette.style.height = commande.hauteur_palette_part * ratio_hauteur + "px";
     dessin_commande.appendChild(dessin_palette);
 
@@ -203,6 +204,7 @@ function creation_dessin_commande(commande) {
     if ((commande.nb_palettes + commande.delta_nb_palettes == 2) && (commande.nb_colis + commande.delta_nb_colis > commande.infos_colis.nb_par_rang * 2)) {
         let new_palette = document.createElement("div");
         new_palette.setAttribute("class", "palette");
+        new_palette.style.backgroundColor = palette_infos.couleur;
         new_palette.style.height = commande.hauteur_palette_part * ratio_hauteur + "px";
         new_palette.style.top = commande.hauteur_total / 2 * ratio_hauteur + "px";
         dessin_colis.appendChild(new_palette);
@@ -579,6 +581,7 @@ function creation_top(palette) {
 
     let palette_pour_reste = document.createElement("div");
     palette_pour_reste.setAttribute("class", "palette");
+    palette_pour_reste.style.backgroundColor = palette_infos.couleur;
     palette_pour_reste.style.height = hauteur_palette * ratio_hauteur + "px";
     dessin_colis_reste.appendChild(palette_pour_reste);
 

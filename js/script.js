@@ -9,6 +9,8 @@ status_creation_commande.nb_colis = null;
 status_creation_commande.id_colis = null;
 status_creation_commande.nb_palettes = null;
 
+var param_modifie = false;
+
 function ajout_commande() {
     // Ajoute une nouvelle ligne pour une nouvelle commande.
     let main_part = document.getElementById("main");;
@@ -68,9 +70,10 @@ function ajout_commande() {
     palette_infos.setAttribute("class", "palette_infos");
 
     let btn_palette = document.createElement("button");
-    btn_palette.innerHTML = status_creation_commande.nb_palettes;
+    btn_palette.setAttribute("class", "ac_nb_palettes");
     btn_palette.setAttribute("id", "nb_palettes_commande_"+status_creation_commande.id_commande);
     btn_palette.setAttribute("id_commande", status_creation_commande.id_commande);
+    btn_palette.innerHTML = status_creation_commande.nb_palettes;
     btn_palette.onclick = function() {
         creation_commande_p3(this.getAttribute("id_commande"));
     }
@@ -78,12 +81,13 @@ function ajout_commande() {
     palette_infos.appendChild(btn_palette);
 
 
-
     nouvelle_ligne.appendChild(colis_infos);
     nouvelle_ligne.appendChild(cagette_infos);
     nouvelle_ligne.appendChild(palette_infos);
 
     main_part.insertBefore(nouvelle_ligne, inserer_valider);
+
+    change_background_bouton("nb_palettes_commande_"+status_creation_commande.id_commande, status_creation_commande.nb_palettes);
 
     status_creation_commande.id_commande += 1;
 }
@@ -175,7 +179,7 @@ function creation_commande_p1(commande_id=null) {
 //      -> nombre < 500,
 //      -> pas plus de 3 caractères.
 function check_valide_input_colis(objet) {
-    objet.value = parseInt(objet.value);
+    objet.value = parseFloat(objet.value);
     let minimum = parseInt(objet.min);
     let maximum = parseInt(objet.max);
     if (objet.value.length > objet.maxLength) {
@@ -282,19 +286,23 @@ function creation_commande_p3(commande_id=null) {
     for (let i=0; i<=max_palettes; i++) {
         let nouveau_bouton = document.createElement("button");
         nouveau_bouton.setAttribute("class", "ac_bouton_palette");
+        nouveau_bouton.setAttribute("id", "creation_running_"+i);
         nouveau_bouton.innerHTML = i;
         nouveau_bouton.onclick = function() {
             if (commande_id == null) {
                 status_creation_commande.nb_palettes = i;
                 document.getElementById("ajouter_commande").style.display = "none";
+                // document.getElementById("nb_palettes_commande_"+commande_id).innerHTML = i;
                 terminer_ajout(true);
             }
             else {
                 document.getElementById("nb_palettes_commande_"+commande_id).innerHTML = i;
+                change_background_bouton("nb_palettes_commande_"+commande_id, i);
                 terminer_ajout(false);
             }
         }
         main_part.appendChild(nouveau_bouton);
+        change_background_bouton("creation_running_"+i, i);
     }
 
     // Affectation de la valeur onclick du bouton ac_bouton_retour_arriere.
@@ -308,6 +316,20 @@ function creation_commande_p3(commande_id=null) {
     }
 }
 
+
+function change_background_bouton(id_bouton, nb_palettes) {
+    bouton = document.getElementById(id_bouton);
+    if (nb_palettes == 0) {
+        bouton.style.background = "transparent";
+    }
+    else if (nb_palettes == 1) {
+        bouton.style.background = "linear-gradient(to bottom, transparent 75%,"+palette_infos.couleur+" 75%)";
+    }
+    else {
+        bouton.style.background = "linear-gradient(to bottom, transparent 25%,"+palette_infos.couleur+" 25%,"+palette_infos.couleur+" 50%,transparent 50%,transparent 75%,"+palette_infos.couleur+" 75%,"+palette_infos.couleur+" 75%)";
+    }
+}
+
 function valider() {
     let liste_commandes = [];
     lignes_commandes = document.getElementsByClassName("ligne_commande");
@@ -318,7 +340,476 @@ function valider() {
         let nb_palettes_commande = document.getElementById("nb_palettes_commande_"+id_commande).innerHTML;
         liste_commandes.push([nb_colis_commande, type_cagette_commande, nb_palettes_commande])
     }
-    // console.log(liste_commandes);
     localStorage.setItem('CH_listeCommandes', liste_commandes.toString());
     location.href = "./palette_puzzle.html";
+}
+
+
+
+
+function ouvre_param(premiere=true) {
+    param_liste_colis = document.getElementById("param_liste_colis");
+    while (param_liste_colis.firstChild) {
+        param_liste_colis.removeChild(param_liste_colis.lastChild);
+    }
+
+    document.getElementById("ajouter_colis").style.display = "block";
+    document.getElementById("valider_param").style.display = "block";
+
+    param_ajouter_colis(palette_infos, true);
+    if (premiere) {
+        param_modifie = false;
+        document.getElementById('parametres').style.display = 'block';
+        document.getElementById("valider_param").style.backgroundColor = "grey";
+        document.getElementById("valider_param").style.borderColor = "grey";
+    }
+
+    if (param_modifie) {
+        document.getElementById("valider_param").style.backgroundColor = "green";
+        document.getElementById("valider_param").style.borderColor = "green";
+    }
+
+    for (let i=0; i<liste_colis.length; i++) {
+        param_ajouter_colis(liste_colis[i]);
+    }
+
+    let dessin_palette_largeur = document.getElementById("param_donnees_palette").offsetHeight;
+    let ecran = document.getElementById("parametres");
+    let dessin_palette_longueur = Math.min(ecran.offsetHeight, ecran.offsetWidth) * 0.3;
+
+    let ratio_resize = dessin_palette_longueur / palette_infos.longueur;
+    if (dessin_palette_largeur / palette_infos.largeur < dessin_palette_longueur / palette_infos.longueur) {
+        ratio_resize = dessin_palette_largeur / palette_infos.largeur;
+    }
+
+    liste_lignes_palettes = document.getElementsByClassName("ligne_param_palette");
+    for (let i=0; i<liste_lignes_palettes.length; i++) {
+        liste_lignes_palettes[i].style.width = palette_infos.longueur * ratio_resize + "px";
+        liste_lignes_palettes[i].style.height = ratio_resize + "px";
+    }
+
+    m_unites = document.getElementsByClassName("m_unite");
+    for (let i=0; i<m_unites.length; i++) {
+        m_unites[i].style.width = ratio_resize + "px";
+        m_unites[i].style.height = ratio_resize + "px";
+    }
+
+    for (let i=0; i<liste_colis; i++) {
+        liste_colis[i].nb_par_rang = parseInt(palette_infos.longueur / liste_colis[i].longueur) * parseInt(palette_infos.largeur / liste_colis[i].largeur);
+    }
+}
+
+
+function param_ajouter_colis(element, palette=false) {
+    document.getElementById("param_bouton_retour_arriere").onclick = function() {
+        document.getElementById('parametres').style.display = 'none';
+        liste_colis = JSON.parse(localStorage.getItem('CH_liste_colis'));
+        palette_infos = JSON.parse(localStorage.getItem('CH_palette_infos'));
+    }
+
+    param_liste_colis = document.getElementById("param_liste_colis");
+
+    let nouveau_colis= document.createElement("li");
+    nouveau_colis.setAttribute("class", "param_colis");
+
+    let titre_colis = document.createElement("h2");
+    titre_colis.setAttribute("class", "param_titre");
+    titre_colis.innerHTML = element.nom;
+
+    let modif_titre = document.createElement("buton");
+    modif_titre.style.backgroundImage = "url(./ressources/pencil.png)";
+    modif_titre.setAttribute("class", "modif_titre");
+    modif_titre.onclick = function() {
+        modifie_valeur_titre(element);
+    }
+    titre_colis.appendChild(modif_titre);
+
+    if (element.typeobjet != "palette") {
+        let suppr_colis = document.createElement("buton");
+        suppr_colis.style.backgroundImage = "url(./ressources/delete.png)";
+        suppr_colis.setAttribute("class", "suppr_titre");
+        suppr_colis.onclick = function() {
+            param_modifie = true;
+            for (let i=0; i<liste_colis.length; i++) {
+                if (liste_colis[i].nom == element.nom) {
+                    liste_colis.splice(i, 1);
+                    ouvre_param(false);
+                    return;
+                }
+            }
+        }
+        titre_colis.appendChild(suppr_colis);
+    }
+
+    let param_infos = document.createElement("div");
+    param_infos.setAttribute("class", "param_infos");
+
+    let choix_couleur = document.createElement("input");
+    choix_couleur.setAttribute("type", "color");
+    choix_couleur.setAttribute("value", element.couleur)
+    choix_couleur.setAttribute("class", "choix_couleur");
+    choix_couleur.onchange = function() {
+        param_modifie = true;
+        element.couleur = this.value;
+        ouvre_param(false);
+    }
+
+    let param_donnees = document.createElement("div");
+    param_donnees.setAttribute("class", "param_donnees");
+    if (palette) {
+        param_donnees.setAttribute("id", "param_donnees_palette");
+    }
+
+    let type_donnees = [["Longueur: ", "longueur", "u", element.longueur], ["Largeur: ", "largeur", "u", element.largeur], ["Hauteur: ", "hauteur", "cm", element.hauteur]];
+    for (let i=0; i<type_donnees.length; i++) {
+        let param_donnee = document.createElement("div");
+        param_donnee.setAttribute("class", "param_donnee");
+
+        let label = document.createElement("p");
+        label.setAttribute("class", "label");
+        label.innerHTML = type_donnees[i][0];
+
+        let qte = document.createElement("input");
+        qte.setAttribute("type", "number");
+        qte.setAttribute("step", "0.01");
+        qte.setAttribute("size", "5");
+        qte.setAttribute("class", "qte");
+        qte.value = type_donnees[i][3];
+        qte.onclick = function() {
+            modifie_valeur_param(element, type_donnees[i][0]+"("+type_donnees[i][2]+")", type_donnees[i][1]);
+        }
+    
+        let unite = document.createElement("p");
+        unite.setAttribute("class", "unite");
+        unite.innerHTML = type_donnees[i][2];
+
+        param_donnee.appendChild(label);
+        param_donnee.appendChild(qte);
+        param_donnee.appendChild(unite);
+
+        param_donnees.appendChild(param_donnee);
+    }
+
+
+
+
+    let param_palette = document.createElement("div");
+    param_palette.setAttribute("class", "param_palette");
+
+    let  largeur_done = false;
+    for (let i=0; i<palette_infos.largeur; i++) {
+        let longueur_done = false;
+        if (i>=element.largeur) {
+            largeur_done = true;
+            longueur_done = true;
+        }
+        let ligne_param_palette = document.createElement("div");
+        ligne_param_palette.setAttribute("class", "ligne_param_palette");
+        for (let j=0; j<palette_infos.longueur; j++) {
+            if (j>=element.longueur && !largeur_done) {
+                longueur_done = true;
+            }
+            let m_unite = document.createElement("div");
+            if (palette || !longueur_done) {
+                m_unite.style.backgroundColor = element.couleur;
+            }
+            else {
+                m_unite.style.backgroundColor = palette_infos.couleur;
+                m_unite.style.opacity = "0.5";
+            }
+            m_unite.setAttribute("class", "m_unite");
+            ligne_param_palette.appendChild(m_unite);
+        }
+        param_palette.appendChild(ligne_param_palette);
+    }
+
+
+    param_infos.appendChild(choix_couleur);
+    param_infos.appendChild(param_donnees);
+    param_infos.appendChild(param_palette);
+
+    nouveau_colis.appendChild(titre_colis);
+    nouveau_colis.appendChild(param_infos);
+
+    param_liste_colis.appendChild(nouveau_colis);
+}
+
+
+
+function modifie_valeur_titre(element) {
+    document.getElementById("param_bouton_retour_arriere").onclick = function() {
+        ouvre_param(false);
+    }
+    document.getElementById("ajouter_colis").style.display = "none";
+    document.getElementById("valider_param").style.display = "none";
+
+    param_liste_colis = document.getElementById("param_liste_colis");
+    while (param_liste_colis.firstChild) {
+        param_liste_colis.removeChild(param_liste_colis.lastChild);
+    }
+
+    let titre_change = document.createElement("h2");
+    titre_change.setAttribute("id", "titre_change");
+    titre_change.innerHTML = element.nom;
+
+    let label_change = document.createElement("p");
+    label_change.setAttribute("id", "label_change");
+    label_change.innerHTML = "Nom: ";
+
+    let input_change = document.createElement("input");
+    input_change.setAttribute("type", "text");
+    input_change.setAttribute("name", "input_change");
+    input_change.setAttribute("id", "input_change");
+    input_change.setAttribute("size", "1");
+    input_change.setAttribute("value", element.nom);
+
+    let btn_valider = document.createElement("button");
+    btn_valider.setAttribute("id", "param_valide_change");
+    btn_valider.innerHTML = "valider";
+    btn_valider.onclick = function() {
+        param_modifie = true;
+        element.nom = document.getElementById("input_change").value;
+        ouvre_param(false);
+    }
+
+    param_liste_colis.appendChild(titre_change);
+    param_liste_colis.appendChild(label_change);
+    param_liste_colis.appendChild(input_change);
+    param_liste_colis.appendChild(btn_valider);
+    document.getElementById("input_change").focus()
+    let val = document.getElementById("input_change").value;
+    document.getElementById("input_change").value = '';
+    document.getElementById("input_change").value = val;
+}
+
+function modifie_valeur_param(element, type_elem, variable) {
+    let data;
+    if (variable == "longueur") {
+        data = element.longueur;
+    }
+    else if (variable == "largeur") {
+        data = element.largeur;
+    }
+    else {
+        data = element.hauteur;
+    }
+    document.getElementById("param_bouton_retour_arriere").onclick = function() {
+        ouvre_param(false);
+    }
+    document.getElementById("ajouter_colis").style.display = "none";
+    document.getElementById("valider_param").style.display = "none";
+
+    param_liste_colis = document.getElementById("param_liste_colis");
+    while (param_liste_colis.firstChild) {
+        param_liste_colis.removeChild(param_liste_colis.lastChild);
+    }
+    let titre_change = document.createElement("h2");
+    titre_change.setAttribute("id", "titre_change");
+    titre_change.innerHTML = element.nom;
+
+    let label_change = document.createElement("p");
+    label_change.setAttribute("id", "label_change");
+    label_change.innerHTML = type_elem;
+
+    let input_change = document.createElement("input");
+    input_change.setAttribute("type", "number");
+    input_change.setAttribute("name", "input_change");
+    input_change.setAttribute("id", "input_change");
+    input_change.setAttribute("min", 0);
+    input_change.setAttribute("max", 20);
+    input_change.setAttribute("maxlength", "3");
+    if (variable != "hauteur") {
+        input_change.setAttribute("oninput", "check_valide_input_colis(this)");
+    }
+    else {
+        input_change.setAttribute("step", "0.01");
+    }
+    input_change.setAttribute("size", "1");
+    input_change.setAttribute("value", data);
+
+    let btn_valider = document.createElement("button");
+    btn_valider.setAttribute("id", "param_valide_change");
+    btn_valider.innerHTML = "valider";
+    btn_valider.onclick = function() {
+        param_modifie = true;
+        if (variable == "longueur") {
+            element.longueur = document.getElementById("input_change").value;
+        }
+        else if (variable == "largeur") {
+            element.largeur = document.getElementById("input_change").value;
+        }
+        else {
+            element.hauteur = document.getElementById("input_change").value;
+        }
+        ouvre_param(false);
+    }
+
+    param_liste_colis.appendChild(titre_change);
+    param_liste_colis.appendChild(label_change);
+    param_liste_colis.appendChild(input_change);
+    param_liste_colis.appendChild(btn_valider);
+    document.getElementById("input_change").focus()
+    let val = document.getElementById("input_change").value;
+    document.getElementById("input_change").value = '';
+    document.getElementById("input_change").value = val;
+
+}
+
+function creation_colis() {
+    document.getElementById("param_bouton_retour_arriere").onclick = function() {
+        ouvre_param(false);
+    }
+    document.getElementById("ajouter_colis").style.display = "none";
+    document.getElementById("valider_param").style.display = "none";
+    let nouveau_colis = new TypeColis("", 1, 1, 0, 1, "");
+    creation_colis_p1(nouveau_colis);
+}
+
+function creation_colis_p1(nouveau_colis) {
+    param_liste_colis = document.getElementById("param_liste_colis");
+    while (param_liste_colis.firstChild) {
+        param_liste_colis.removeChild(param_liste_colis.lastChild);
+    }
+    let titre_change = document.createElement("h2");
+    titre_change.setAttribute("id", "titre_change");
+    titre_change.innerHTML = "Nouveau colis";
+
+    let label_change = document.createElement("p");
+    label_change.setAttribute("id", "label_change");
+    label_change.innerHTML = "Nom:"
+
+    let input_change = document.createElement("input");
+    input_change.setAttribute("type", "text");
+    input_change.setAttribute("name", "input_change");
+    input_change.setAttribute("id", "input_change");
+    input_change.setAttribute("size", "1");
+
+    let btn_valider = document.createElement("button");
+    btn_valider.setAttribute("id", "param_valide_change");
+    btn_valider.innerHTML = "valider";
+    btn_valider.onclick = function() {
+        nouveau_colis.nom = document.getElementById("input_change").value;
+        creation_colis_p2(nouveau_colis);
+    }
+
+    param_liste_colis.appendChild(titre_change);
+    param_liste_colis.appendChild(label_change);
+    param_liste_colis.appendChild(input_change);
+    param_liste_colis.appendChild(btn_valider);
+    document.getElementById("input_change").focus()
+}
+
+
+function creation_colis_p2(nouveau_colis) {
+    let couleur = "#ff0000";
+    let liste_choix = ["Longueur: (u)", "Largeur: (u)", "Hauteur: (cm)"];
+    param_liste_colis = document.getElementById("param_liste_colis");
+    while (param_liste_colis.firstChild) {
+        param_liste_colis.removeChild(param_liste_colis.lastChild);
+    }
+    let titre_change = document.createElement("h2");
+    titre_change.setAttribute("id", "titre_change");
+    titre_change.innerHTML = nouveau_colis.nom;
+
+    let label_change = document.createElement("p");
+    label_change.setAttribute("id", "label_change");
+    label_change.innerHTML = "Couleur: ";
+
+    let choix_couleur = document.createElement("input");
+    choix_couleur.setAttribute("type", "color");
+    choix_couleur.setAttribute("class", "choix_couleur");
+    choix_couleur.setAttribute("id", "param_couleur_change");
+    choix_couleur.onchange = function() {
+        couleur = this.value;
+    }
+
+    let btn_valider = document.createElement("button");
+    btn_valider.setAttribute("id", "param_valide_change");
+    btn_valider.innerHTML = "valider";
+    btn_valider.onclick = function() {
+        nouveau_colis.couleur = couleur;
+        creation_colis_p3(nouveau_colis, 0);
+    }
+
+    param_liste_colis.appendChild(titre_change);
+    param_liste_colis.appendChild(label_change);
+    param_liste_colis.appendChild(choix_couleur);
+    param_liste_colis.appendChild(btn_valider);
+}
+
+function creation_colis_p3(nouveau_colis, i) {
+    let liste_choix = ["Longueur: (u)", "Largeur: (u)", "Hauteur: (cm)"];
+    param_liste_colis = document.getElementById("param_liste_colis");
+    while (param_liste_colis.firstChild) {
+        param_liste_colis.removeChild(param_liste_colis.lastChild);
+    }
+    let titre_change = document.createElement("h2");
+    titre_change.setAttribute("id", "titre_change");
+    titre_change.innerHTML = nouveau_colis.nom;
+
+    let label_change = document.createElement("p");
+    label_change.setAttribute("id", "label_change");
+    label_change.innerHTML = liste_choix[i];
+
+    let input_change = document.createElement("input");
+    input_change.setAttribute("type", "number");
+    input_change.setAttribute("name", "input_change");
+    input_change.setAttribute("id", "input_change");
+    input_change.setAttribute("min", 0);
+    input_change.setAttribute("max", 20);
+    input_change.setAttribute("maxlength", "3");
+    if (i != 2) {
+        input_change.setAttribute("oninput", "check_valide_input_colis(this)");
+    }
+    else {
+        input_change.setAttribute("step", "0.01");
+    }
+    input_change.setAttribute("size", "1");
+
+    let btn_valider = document.createElement("button");
+    btn_valider.setAttribute("id", "param_valide_change");
+    btn_valider.innerHTML = "valider";
+    btn_valider.onclick = function() {
+        if (i==0) {
+            nouveau_colis.longueur = parseInt(document.getElementById("input_change").value);
+            creation_colis_p3(nouveau_colis, (i+1));
+        }
+        else if (i==1) {
+            nouveau_colis.largeur = parseInt(document.getElementById("input_change").value);
+            creation_colis_p3(nouveau_colis, (i+1));
+        }
+        else if (i==2) {
+            nouveau_colis.hauteur = parseFloat(document.getElementById("input_change").value);
+            liste_colis.push(nouveau_colis);
+            param_modifie = true;
+            ouvre_param(false);
+
+        }
+    }
+
+    param_liste_colis.appendChild(titre_change);
+    param_liste_colis.appendChild(label_change);
+    param_liste_colis.appendChild(input_change);
+    param_liste_colis.appendChild(btn_valider);
+    document.getElementById("input_change").focus()
+}
+
+function valider_parametres() {
+    if (!param_modifie) {
+        document.getElementById('parametres').style.display = 'none';
+        return;
+    }
+    localStorage.setItem('CH_palette_infos', JSON.stringify(palette_infos));
+    localStorage.setItem('CH_liste_colis', JSON.stringify(liste_colis));
+    location.href = "./index.html";
+}
+
+
+
+
+function erase_commandes() {
+    main = document.getElementById("main");
+    while (main.firstChild.getAttribute("id") != "inserer_valider") {
+        main.removeChild(main.firstChild);
+    }
 }

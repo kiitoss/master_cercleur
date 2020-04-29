@@ -100,7 +100,6 @@ body {
 
 
 .palette {
-    background-color: rgb(71, 71, 160);
     background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
     position: absolute;
     bottom: 0;
@@ -258,11 +257,13 @@ body {
 }
 
 
-/* #chargement {
-    position: absolute;
-    display: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid green;
-    border-radius: 20px;
-} */
+.back_bouton {
+    background-image: url("../ressources/back_arrow.png");
+    background-size: 50px 50px;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+}
