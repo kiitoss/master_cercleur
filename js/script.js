@@ -1,3 +1,12 @@
+var session_commandes = [];
+var CH_listeCommandes_session = sessionStorage.getItem('CH_listeCommandes_session');
+if ((CH_listeCommandes_session) && (CH_listeCommandes_session.split(',').length%3 == 0)) {
+    CH_listeCommandes_session = CH_listeCommandes_session.split(',')
+    for (let i=0; i<CH_listeCommandes_session.length; i+=3) {
+        session_commandes.push([CH_listeCommandes_session[i], CH_listeCommandes_session[i+1], CH_listeCommandes_session[i+2]]);
+    }
+}
+
 var choix_type_colis = [];
 for (let i=0; i<liste_colis.length; i++) {
     choix_type_colis.push(liste_colis[i].nom);
@@ -31,6 +40,7 @@ function ajout_commande() {
     let input_colis = document.createElement("input");
     input_colis.setAttribute("type", "number");
     input_colis.setAttribute("name", "input_colis");
+    input_colis.setAttribute("class", "input_colis");
     input_colis.setAttribute("value", status_creation_commande.nb_colis);
     input_colis.setAttribute("id", "nb_colis_commande_"+status_creation_commande.id_commande);
     input_colis.setAttribute("id_commande", status_creation_commande.id_commande);
@@ -54,6 +64,7 @@ function ajout_commande() {
     let input_cagette = document.createElement("input");
     input_cagette.setAttribute("type", "text");
     input_cagette.setAttribute("name", "input_cagette");
+    input_cagette.setAttribute("class", "input_cagette");
     input_cagette.setAttribute("value", choix_type_colis[status_creation_commande.id_colis]);
     input_cagette.setAttribute("id", "type_cagette_commande_"+status_creation_commande.id_commande);
     input_cagette.setAttribute("id_commande", status_creation_commande.id_commande);
@@ -341,6 +352,7 @@ function valider() {
         liste_commandes.push([nb_colis_commande, type_cagette_commande, nb_palettes_commande])
     }
     localStorage.setItem('CH_listeCommandes', liste_commandes.toString());
+    sessionStorage.setItem('CH_listeCommandes_session', liste_commandes.toString());
     location.href = "./palette_puzzle.html";
 }
 
@@ -538,9 +550,9 @@ function param_ajouter_colis(element, palette=false) {
 
 function modifie_valeur_titre(element) {
     document.getElementById("param_hauteurs").style.display = "none";
-    document.getElementById("param_bouton_retour_arriere").onclick = function() {
-        ouvre_param(false);
-    }
+    // document.getElementById("param_bouton_retour_arriere").onclick = function() {
+    //     ouvre_param(false);
+    // }
     document.getElementById("ajouter_colis").style.display = "none";
     document.getElementById("valider_param").style.display = "none";
 
@@ -568,6 +580,9 @@ function modifie_valeur_titre(element) {
     btn_valider.setAttribute("id", "param_valide_change");
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
+        if (document.getElementById("input_change").value.length == 0) {
+            alert("Veuillez rentrer un nom.");
+        }
         if (element.nom != document.getElementById("input_change").value) {
             let exist_deja = false;
             for (let i=0; i<liste_colis.length; i++) {
@@ -595,12 +610,19 @@ function modifie_valeur_titre(element) {
     param_liste_colis.appendChild(input_change);
     param_liste_colis.appendChild(btn_valider);
     document.getElementById("input_change").focus()
+    document.getElementById("input_change").onchange = function() {
+        alert('a)');
+        document.getElementById("param_valide_change").click();
+    }
     let val = document.getElementById("input_change").value;
     document.getElementById("input_change").value = '';
     document.getElementById("input_change").value = val;
 }
 
 function modifie_valeur_param(element, type_elem, variable) {
+    document.getElementById("param_bouton_retour_arriere").onclick = function() {
+        ouvre_param(false);
+    }
     document.getElementById("param_hauteurs").style.display = "none";
     let data;
     if (variable == "longueur") {
@@ -611,9 +633,6 @@ function modifie_valeur_param(element, type_elem, variable) {
     }
     else {
         data = element.hauteur;
-    }
-    document.getElementById("param_bouton_retour_arriere").onclick = function() {
-        ouvre_param(false);
     }
     document.getElementById("ajouter_colis").style.display = "none";
     document.getElementById("valider_param").style.display = "none";
@@ -650,6 +669,11 @@ function modifie_valeur_param(element, type_elem, variable) {
     btn_valider.setAttribute("id", "param_valide_change");
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
+        if (document.getElementById("input_change").value.length == 0) {
+            alert("Veuillez rentrer une "+variable+".");
+            modifie_valeur_param(element, type_elem, variable);
+            return;
+        }
         if (variable == "longueur") {
             if (element.typeobjet == "palette") {
                 for (let i=0; i<liste_colis.length; i++) {
@@ -704,6 +728,9 @@ function modifie_valeur_param(element, type_elem, variable) {
     param_liste_colis.appendChild(input_change);
     param_liste_colis.appendChild(btn_valider);
     document.getElementById("input_change").focus()
+    document.getElementById("input_change").onchange = function() {
+        document.getElementById("param_valide_change").click();
+    }
     let val = document.getElementById("input_change").value;
     document.getElementById("input_change").value = '';
     document.getElementById("input_change").value = val;
@@ -745,6 +772,11 @@ function creation_colis_p1(nouveau_colis) {
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
         nouveau_colis.nom = document.getElementById("input_change").value;
+        if (nouveau_colis.nom.length == 0) {
+            alert("Veuillez rentrer un nom de colis.");
+            creation_colis_p1(nouveau_colis);
+            return;
+        }
         let exist_deja = false;
         for (let i=0; i<liste_colis.length; i++) {
             if (liste_colis[i].nom == nouveau_colis.nom) {
@@ -755,6 +787,7 @@ function creation_colis_p1(nouveau_colis) {
         if (exist_deja) {
             alert("Ce nom de colis est déjà pris.");
             creation_colis_p1(nouveau_colis);
+            return;
         }
         else {
             creation_colis_p2(nouveau_colis);
@@ -766,6 +799,9 @@ function creation_colis_p1(nouveau_colis) {
     param_liste_colis.appendChild(input_change);
     param_liste_colis.appendChild(btn_valider);
     document.getElementById("input_change").focus()
+    document.getElementById("input_change").onchange = function() {
+        document.getElementById("param_valide_change").click();
+    }
 }
 
 function creation_colis_p2(nouveau_colis) {
@@ -806,6 +842,7 @@ function creation_colis_p2(nouveau_colis) {
 
 function creation_colis_p3(nouveau_colis, i) {
     let liste_choix = ["Longueur: (u)", "Largeur: (v)", "Hauteur: (cm)"];
+    let labels = ["longueuer", "largeur", "hauteur"];
     param_liste_colis = document.getElementById("param_liste_colis");
     while (param_liste_colis.firstChild) {
         param_liste_colis.removeChild(param_liste_colis.lastChild);
@@ -837,6 +874,11 @@ function creation_colis_p3(nouveau_colis, i) {
     btn_valider.setAttribute("id", "param_valide_change");
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
+        if (document.getElementById("input_change").value.length == 0) {
+            alert("Veuillez rentrer une "+labels[i]+".");
+            creation_colis_p3(nouveau_colis, i);
+            return;
+        }
         if (i==0) {
             nouveau_colis.longueur = parseInt(document.getElementById("input_change").value);
             if (nouveau_colis.longueur > palette_infos.longueur) {
@@ -873,6 +915,9 @@ function creation_colis_p3(nouveau_colis, i) {
     param_liste_colis.appendChild(input_change);
     param_liste_colis.appendChild(btn_valider);
     document.getElementById("input_change").focus()
+    document.getElementById("input_change").onchange = function() {
+        document.getElementById("param_valide_change").click();
+    }
 }
 
 function valider_parametres() {
@@ -907,10 +952,54 @@ function erase_commandes() {
     }
 }
 
-function change_hauteur() {
+function change_hauteur(input) {
+    input.blur();
     param_modifie = true;
     hauteur_max = parseFloat(document.getElementById("data_hauteur_max").value);
     hauteur_dangereuse = parseFloat(document.getElementById("data_hauteur_dangereuse").value);
     document.getElementById("valider_param").style.backgroundColor = "green";
     document.getElementById("valider_param").style.borderColor = "green";
+}
+
+
+
+if (session_commandes.length != 0) {
+    for (let i=0; i<session_commandes.length; i++) {
+        status_creation_commande.estOuvert = true;
+        status_creation_commande.nb_colis = parseInt(session_commandes[i][0]);
+        let trouve = false;
+        let index = 0;
+        for (let j=0; j<choix_type_colis.length; j++) {
+            if (choix_type_colis[j] == session_commandes[i][1]) {
+                trouve = true;
+                index = j
+                break;
+            }
+        }
+        if (trouve) {
+            status_creation_commande.id_colis = index;
+            status_creation_commande.nb_palettes = session_commandes[i][2];
+            terminer_ajout(true);
+        }
+        else {
+            alert("Le colis "+session_commandes[i][1]+" n'existe plus, la commande en mémoire a donc été effacée.");
+        }
+    }
+}
+else {
+    document.getElementById("titre_page").style.animationDuration = "2s";
+    document.getElementById("titre_page").style.animationName = "animation_entree";
+
+    document.getElementById("bouton_parametre").style.animationDuration = "4s";
+    document.getElementById("bouton_parametre").style.animationName = "apparition_entree";
+
+    document.getElementById("bouton_erase").style.animationDuration = "4s";
+    document.getElementById("bouton_erase").style.animationName = "apparition_entree";
+
+
+    document.getElementById("second_titre").style.animationDuration = "4s";
+    document.getElementById("second_titre").style.animationName = "apparition_entree";
+
+    document.getElementById("main").style.animationDuration = "4s";
+    document.getElementById("main").style.animationName = "apparition_entree";
 }
