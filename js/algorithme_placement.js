@@ -155,6 +155,7 @@ function AP_superpose_colis() {
 function AP_test_placement() {
     AP_creation_LC();
     AP_tri_volume([]);
+
     // Création d'une copie de la AP_palette originale.
     let nouvelle_palette = [];
     for (let j=0; j<AP_palette.length; j++) {
@@ -170,44 +171,72 @@ function AP_test_placement() {
 
 // Place les colis sur la AP_palette.
 function AP_place(ma_palette, index, pos_x, pos_y, liste_places) {
+    let aire_totale = 0;
+    for (let i=0; i<AP_LC.length; i++) {
+        aire_totale += (AP_LC[i].longueur * AP_LC[i].largeur);
+    }
+    if (aire_totale > palette_infos.longueur * palette_infos.largeur) {
+        AP_facteur_superposition++;
+        AP_change_hauteur_max();
+        return;
+    }
+
     if (index > AP_LC.length-1) {
         return;
     }
 
     let colis = AP_LC[index];
 
-    let repetition = 1;
+    // let repetition = 1;
 
-    if (colis.longueur != colis.largeur) {
-        repetition = 2;
-    }
-    for (let k=0; k<repetition; k++) {
-        //Initialise les valeurs.
-        let cp_index = index;
-        let nouvelle_palette = [];
-        let cp_pos_x = pos_x;
-        let cp_pos_y = pos_y;
-        for (let j=0; j<ma_palette.length; j++) {
-            nouvelle_palette.push([]);
-            for (let i=0; i<ma_palette[j].length; i++) {
-                nouvelle_palette[j].push(ma_palette[j][i]);
-            }
-        }
-        let cp_liste_places = [];
-        for (let i=0; i<liste_places.length; i++) {
-            cp_liste_places.push(liste_places[i]);
-        }
+    // if (colis.longueur != colis.largeur) {
+    //     repetition = 2;
+    // }
+    // for (let k=0; k<repetition; k++) {
+    //     //Initialise les valeurs.
+    //     let cp_index = index;
+    //     let nouvelle_palette = [];
+    //     let cp_pos_x = pos_x;
+    //     let cp_pos_y = pos_y;
+    //     for (let j=0; j<ma_palette.length; j++) {
+    //         nouvelle_palette.push([]);
+    //         for (let i=0; i<ma_palette[j].length; i++) {
+    //             nouvelle_palette[j].push(ma_palette[j][i]);
+    //         }
+    //     }
+    //     let cp_liste_places = [];
+    //     for (let i=0; i<liste_places.length; i++) {
+    //         cp_liste_places.push(liste_places[i]);
+    //     }
 
-        // Lance la fonction de placement (longueur).
-        AP_place_longueur(nouvelle_palette, colis, cp_pos_x, cp_pos_y, cp_liste_places, cp_index);
+    //     // Lance la fonction de placement (longueur).
+    //     AP_place_longueur(nouvelle_palette, colis, cp_pos_x, cp_pos_y, cp_liste_places, cp_index);
     
-        // Si la longueur est différente de la largeur, on reproduit en inversant longueur/largeur.
-        if (colis.longueur != colis.largeur) {
-            let change = colis.longueur;
-            colis.longueur = colis.largeur;
-            colis.largeur = change;
+    //     // Si la longueur est différente de la largeur, on reproduit en inversant longueur/largeur.
+    //     if (colis.longueur != colis.largeur) {
+    //         let change = colis.longueur;
+    //         colis.longueur = colis.largeur;
+    //         colis.largeur = change;
+    //     }
+    // }
+
+    let cp_index = index;
+    let nouvelle_palette = [];
+    let cp_pos_x = pos_x;
+    let cp_pos_y = pos_y;
+    for (let j=0; j<ma_palette.length; j++) {
+        nouvelle_palette.push([]);
+        for (let i=0; i<ma_palette[j].length; i++) {
+            nouvelle_palette[j].push(ma_palette[j][i]);
         }
     }
+    let cp_liste_places = [];
+    for (let i=0; i<liste_places.length; i++) {
+        cp_liste_places.push(liste_places[i]);
+    }
+
+    // Lance la fonction de placement (longueur).
+    AP_place_longueur(nouvelle_palette, colis, cp_pos_x, cp_pos_y, cp_liste_places, cp_index);
 }
 
 // Place le colis sur tous les espaces possibles de la AP_palette, appel 'place()' à chaque placement valide.

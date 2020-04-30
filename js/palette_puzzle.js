@@ -360,7 +360,7 @@ function clique_optimisation(mouse_clique=true) {
     // if (optimisation_en_cours) {
         AP_liste_colis = [];
         for (let i=0; i<old_commande.length; i++) {
-            if (old_commande[i].reste != 0) {
+            if (old_commande[i].reste < old_commande[i].infos_colis.nb_par_rang / 2) {
                 let ajoute = false;
                 for (let j=0; j<AP_liste_colis.length; j++) {
                     if (AP_liste_colis[j][1] == old_commande[i].infos_colis.nom) {
@@ -557,6 +557,7 @@ function creation_top(palette) {
         new_colis_reste.setAttribute("class", "new_colis_reste");
         new_colis_reste.style.width = (colis_palette[i][5]*colis_palette[i][6] / aire_palette) * (Math.min(window.innerHeight, window.innerWidth) * 0.7)+"px";
         new_colis_reste.style.height = (parseFloat(colis_palette[i][8] * colis_palette[i][2]) * ratio_hauteur)+"px";
+        new_colis_reste.style.bottom = (palette_infos.hauteur * ratio_hauteur)+"px";
         if (colis_palette[i][2] > 1) {
             let pos_top = (hauteur_max_reste - (parseFloat(colis_palette[i][8] * colis_palette[i][2])) * ratio_hauteur);
             new_colis_reste.style.display = "flex";
@@ -571,9 +572,6 @@ function creation_top(palette) {
                 pos_top -= parseFloat(colis_palette[i][8] * colis_palette[i][2]) * ratio_hauteur;
                 new_colis_reste.appendChild(sous_colis);
             }
-        }
-        else {
-            new_colis_reste.style.top = (hauteur_max_reste - (parseFloat(colis_palette[i][8] * colis_palette[i][2])) * ratio_hauteur)+"px";
         }
         new_colis_reste.style.left = avance_left + "px";
         new_colis_reste.style.backgroundColor = colis_palette[i][7];

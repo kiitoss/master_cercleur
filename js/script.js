@@ -462,7 +462,7 @@ function param_ajouter_colis(element, palette=false) {
         param_donnees.setAttribute("id", "param_donnees_palette");
     }
 
-    let type_donnees = [["Longueur: ", "longueur", "u", element.longueur], ["Largeur: ", "largeur", "u", element.largeur], ["Hauteur: ", "hauteur", "cm", element.hauteur]];
+    let type_donnees = [["Longueur: ", "longueur", "u", element.longueur], ["Largeur: ", "largeur", "v", element.largeur], ["Hauteur: ", "hauteur", "cm", element.hauteur]];
     for (let i=0; i<type_donnees.length; i++) {
         let param_donnee = document.createElement("div");
         param_donnee.setAttribute("class", "param_donnee");
@@ -651,10 +651,20 @@ function modifie_valeur_param(element, type_elem, variable) {
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
         if (variable == "longueur") {
+            if (element.typeobjet == "palette") {
+                for (let i=0; i<liste_colis.length; i++) {
+                    if (liste_colis[i].longueur > parseInt(document.getElementById("input_change").value)) {
+                        alert("Vous avez rentré une longueur de palette inférieure à la longueur d'un des colis ("+liste_colis[i].nom+")");
+                        modifie_valeur_param(element, type_elem, variable);
+                        return;
+                    }
+                }
+            }
             element.longueur = parseInt(document.getElementById("input_change").value);
             if (element.longueur > palette_infos.longueur) {
                 alert("Vous avez rentré une plus grande longueur que la palette ("+palette_infos.longueur+"u)");
                 modifie_valeur_param(element, type_elem, variable)
+                return;
             }
             else {
                 param_modifie = true;
@@ -662,10 +672,20 @@ function modifie_valeur_param(element, type_elem, variable) {
             }
         }
         else if (variable == "largeur") {
+            if (element.typeobjet == "palette") {
+                for (let i=0; i<liste_colis.length; i++) {
+                    if (liste_colis[i].largeur > parseInt(document.getElementById("input_change").value)) {
+                        alert("Vous avez rentré une largeur de palette inférieure à la longueur d'un des colis ("+liste_colis[i].nom+")");
+                        modifie_valeur_param(element, type_elem, variable);
+                        return;
+                    }
+                }
+            }
             element.largeur = parseInt(document.getElementById("input_change").value);
             if (element.largeur > palette_infos.largeur) {
-                alert("Vous avez rentré une plus grande largeur que la palette ("+palette_infos.largeur+"u)");
+                alert("Vous avez rentré une plus grande largeur que la palette ("+palette_infos.largeur+"v)");
                 modifie_valeur_param(element, type_elem, variable)
+                return;
             }
             else {
                 param_modifie = true;
@@ -785,7 +805,7 @@ function creation_colis_p2(nouveau_colis) {
 }
 
 function creation_colis_p3(nouveau_colis, i) {
-    let liste_choix = ["Longueur: (u)", "Largeur: (u)", "Hauteur: (cm)"];
+    let liste_choix = ["Longueur: (u)", "Largeur: (v)", "Hauteur: (cm)"];
     param_liste_colis = document.getElementById("param_liste_colis");
     while (param_liste_colis.firstChild) {
         param_liste_colis.removeChild(param_liste_colis.lastChild);
@@ -822,6 +842,7 @@ function creation_colis_p3(nouveau_colis, i) {
             if (nouveau_colis.longueur > palette_infos.longueur) {
                 alert("Vous avez rentré une plus grande longueur que la palette ("+palette_infos.longueur+"u)");
                 creation_colis_p3(nouveau_colis, i);
+                return;
             }
             else {
                 creation_colis_p3(nouveau_colis, (i+1));
@@ -830,8 +851,9 @@ function creation_colis_p3(nouveau_colis, i) {
         else if (i==1) {
             nouveau_colis.largeur = parseInt(document.getElementById("input_change").value);
             if (nouveau_colis.largeur > palette_infos.largeur) {
-                alert("Vous avez rentré une plus grande largeur que la palette ("+palette_infos.largeur+"u)");
+                alert("Vous avez rentré une plus grande largeur que la palette ("+palette_infos.largeur+"v)");
                 creation_colis_p3(nouveau_colis, i);
+                return;
             }
             else {
                 creation_colis_p3(nouveau_colis, (i+1));

@@ -2,7 +2,7 @@
 var hauteur_max = 0;
 var CH_hauteur_max = localStorage.getItem('CH_hauteur_max');
 if (!CH_hauteur_max) {
-    hauteur_max = 260;
+    hauteur_max = 255;
     localStorage.setItem('CH_hauteur_max', hauteur_max);
 }
 else {
@@ -22,7 +22,7 @@ else {
 var palette_infos;
 var CH_palette_infos = JSON.parse(localStorage.getItem('CH_palette_infos'));
 if (!CH_palette_infos) {
-    palette_infos = new Palette(8, 4, 14.5,rgb_to_hex(20, 20, 250));
+    palette_infos = new Palette(4, 2, 14.5,rgb_to_hex(20, 20, 250));
     localStorage.setItem('CH_palette_infos', JSON.stringify(palette_infos));
 }
 else {
@@ -34,9 +34,13 @@ var liste_colis = [];
 var CH_liste_colis = JSON.parse(localStorage.getItem('CH_liste_colis'));
 if (!CH_liste_colis) {
     liste_colis = [
-        new TypeColis("carton bois", 2, 2, 10.5, rgb_to_hex(100, 50, 100)),
-        new TypeColis("carton beige", 2, 2, 10, rgb_to_hex(100, 100, 20)),
-        new TypeColis("IFCO", 2, 2, 10.5, rgb_to_hex(20, 250, 20))
+        new TypeColis("cagette bois", 1, 1, 12.3, rgb_to_hex(222,184,135)),
+        new TypeColis("COGIT", 2, 1, 10.4, rgb_to_hex(0,100,0)),
+        new TypeColis("IFCO (petit)", 2, 1, 11.5, rgb_to_hex(0,255,0)),
+        new TypeColis("Carton noir", 2, 1, 10.73, rgb_to_hex(10, 10, 10)),
+        new TypeColis("IFCO (grand)", 2, 1, 18.5, rgb_to_hex(0,255,0)),
+        new TypeColis("Carton rouge", 1, 1, 12, rgb_to_hex(255, 0, 0)),
+        new TypeColis("Carton blanc", 2, 1, 17.33, rgb_to_hex(255, 255, 255))
     ];
     localStorage.setItem('CH_liste_colis', JSON.stringify(liste_colis));
 }

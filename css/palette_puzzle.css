@@ -252,7 +252,8 @@ body {
 
 .new_colis_reste {
     position: absolute;
-    top: 0;
+    /* top: 0; */
+    /* bottom: 0; */
     border-left: 1px solid black;
 }
 
