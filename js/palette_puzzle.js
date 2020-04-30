@@ -360,7 +360,7 @@ function clique_optimisation(mouse_clique=true) {
     // if (optimisation_en_cours) {
         AP_liste_colis = [];
         for (let i=0; i<old_commande.length; i++) {
-            if (old_commande[i].reste < old_commande[i].infos_colis.nb_par_rang / 2) {
+            if (old_commande[i].reste > 0) {
                 let ajoute = false;
                 for (let j=0; j<AP_liste_colis.length; j++) {
                     if (AP_liste_colis[j][1] == old_commande[i].infos_colis.nom) {
@@ -376,6 +376,19 @@ function clique_optimisation(mouse_clique=true) {
                 old_commande[i].delta_nb_colis -= old_commande[i].reste;
             }
         }
+
+        if (AP_liste_colis.length < 3) {
+            for (let j=0; j<AP_liste_colis.length; j++) {
+                for (let i=old_commande.length - 1; i>-1; i--) {
+                    if (old_commande[i].infos_colis.nom == AP_liste_colis[j][1]) {
+                        old_commande[i].delta_nb_colis += AP_liste_colis[j][0];
+                        break;
+                    }
+                }
+            }
+            AP_liste_colis = [];
+        }
+
         
 
         for (let i=old_commande.length-1; i>-1; i--) {
@@ -386,7 +399,7 @@ function clique_optimisation(mouse_clique=true) {
             ajout_suppression_commande(old_commande[i], true);
         }
 
-        if (AP_liste_colis.length != 0) {
+        if (AP_liste_colis.length > 0) {
             AP_first_main();
             if (AP_result.length != []) {
                 creation_top(AP_result);

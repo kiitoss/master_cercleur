@@ -611,7 +611,6 @@ function modifie_valeur_titre(element) {
     param_liste_colis.appendChild(btn_valider);
     document.getElementById("input_change").focus()
     document.getElementById("input_change").onchange = function() {
-        alert('a)');
         document.getElementById("param_valide_change").click();
     }
     let val = document.getElementById("input_change").value;
