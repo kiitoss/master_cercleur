@@ -4,20 +4,10 @@ Master Cercleur est une application pour optimiser le gerbage (empilement) des p
 ## Interface
 Composée de larges boutons, l'interface doit montrer rapidement l'inventaire des commandes saisies par l'utilisateur.
 
-<div>
-<img src="ressources/img_readme/saisie_colis.jpg"
+<img src="ressources/img_readme/affichage.png"
     alt="saisie_colis"
-    style="width: 20%;"/>
-<img src="ressources/img_readme/saisie_type_colis.jpg"
-    alt="saisie_type_colis"
-    style="margin-left: 5%; width: 20%"/>
-<img src="ressources/img_readme/saisie_palette.jpg"
-    alt="saisie_palette"
-    style="margin-left: 5%; width: 20%"/>
-<img src="ressources/img_readme/accueil.jpg"
-    alt="presentation_accueil"
-    style="margin-left: 5%; width: 20%"/>
-</div>
+    style="margin: auto;"/>
+
 
 L'utilisateur peut modifier en paramètres les longueurs, largeurs et hauteurs des différents cartons ainsi que de la palette.
 
@@ -31,13 +21,8 @@ A ce moment le programme mélange les commandes avec les mêmes types de colis p
 Si après cela, la hauteur dépasse encore la hauteur maximale autorisée, tous les "restes" de commande (rang non plein) sont récupérés puis placés sur une unique palette par dessus le reste.
 
 
-<div>
-<img src="ressources/img_readme/non_optimise.jpg"
+<img src="ressources/img_readme/optimisation.png"
     alt="saisie_colis"
-    style="margin-left: 20%; width: 20%;"/>
-<img src="ressources/img_readme/optimise.jpg"
-    alt="saisie_type_colis"
-    style="margin-left: 20%; width: 20%"/>
-</div>
+    style="margin: auto;"/>
 
 
