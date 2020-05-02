@@ -20,9 +20,11 @@ status_creation_commande.nb_palettes = null;
 
 var param_modifie = false;
 
+affichage_commandes_memoire();
+
 function ajout_commande() {
     // Ajoute une nouvelle ligne pour une nouvelle commande.
-    let main_part = document.getElementById("main");;
+    let main_part = document.getElementById("main");
     let inserer_valider = document.getElementById("inserer_valider");
 
     let nouvelle_ligne = document.createElement("div");
@@ -59,7 +61,7 @@ function ajout_commande() {
 
     let label_cagette = document.createElement("label");
     label_cagette.setAttribute("for", "input_cagette");
-    label_cagette.innerHTML = "Type cagette: ";
+    label_cagette.innerHTML = "Type colis: ";
 
     let input_cagette = document.createElement("input");
     input_cagette.setAttribute("type", "text");
@@ -107,7 +109,10 @@ function ajout_commande() {
 function terminer_ajout(ajout_valide) {
     if (ajout_valide) {
         ajout_commande();
+        sauvegarder_commandes_memoire();
     }
+    document.getElementById("main").style.display = "block";
+    document.getElementById("main").style.animation = "none";
     document.getElementById("ac_main_ajout_commande").innerHTML = "";
     document.getElementById("ajouter_commande").style.display = "none";
     status_creation_commande.estOuvert = false;
@@ -122,6 +127,7 @@ function creation_nouvelle_commande() {
 
 // Création de l'interface pour choisir le nombre de colis de la commande.
 function creation_commande_p1(commande_id=null) {
+    masque_body();
     // Initialisation
     if (!status_creation_commande.estOuvert) {
         document.getElementById("ajouter_commande").style.display = "block";
@@ -205,6 +211,7 @@ function check_valide_input_colis(objet) {
 
 // Création de l'interface pour choisir le type de colis de la commande.
 function creation_commande_p2(commande_id=null) {
+    masque_body();
     // Initialisation.
     if (!status_creation_commande.estOuvert) {
         document.getElementById("ajouter_commande").style.display = "block";
@@ -253,6 +260,7 @@ function creation_commande_p2(commande_id=null) {
         main_part.appendChild(nouveau_colis);
     }
 
+
     // Coloration de l'input en mémoire (+ le coche) s'il en existe un.
     if (commande_id != null) {
         for (let i=0; i<choix_type_colis.length; i++) {
@@ -280,6 +288,7 @@ function creation_commande_p2(commande_id=null) {
 
 // Création de l'interface pour choisir le nombre de palettes de la commande.
 function creation_commande_p3(commande_id=null) {
+    masque_body();
     // Initialisation.
     if (!status_creation_commande.estOuvert) {
         document.getElementById("ajouter_commande").style.display = "block";
@@ -339,6 +348,11 @@ function change_background_bouton(id_bouton, nb_palettes) {
 }
 
 function valider() {
+    sauvegarder_commandes_memoire(true);
+    location.href = "./palette_puzzle.html";
+}
+
+function sauvegarder_commandes_memoire(changement_page=false) {
     let liste_commandes = [];
     lignes_commandes = document.getElementsByClassName("ligne_commande");
     if (lignes_commandes.length == 0) {
@@ -351,12 +365,18 @@ function valider() {
         let nb_palettes_commande = document.getElementById("nb_palettes_commande_"+id_commande).innerHTML;
         liste_commandes.push([nb_colis_commande, type_cagette_commande, nb_palettes_commande])
     }
-    localStorage.setItem('CH_listeCommandes', liste_commandes.toString());
     sessionStorage.setItem('CH_listeCommandes_session', liste_commandes.toString());
-    location.href = "./palette_puzzle.html";
+
+    if (changement_page) {
+        localStorage.setItem('CH_listeCommandes', liste_commandes.toString());
+    }
 }
 
 function ouvre_param(premiere=true) {
+    masque_body();
+    // document.getElementById("param_bouton_retour_arriere").onclick = function() {
+    //     document.getElementById("main").style.display = "block";
+    // }
     document.getElementById("param_hauteurs").style.display = "block";
     param_liste_colis = document.getElementById("param_liste_colis");
     while (param_liste_colis.firstChild) {
@@ -376,6 +396,7 @@ function ouvre_param(premiere=true) {
         hauteur_dangereuse = localStorage.getItem('CH_hauteur_dangereuse');
     }
 
+    console.log(hauteur_max);
     document.getElementById("data_hauteur_max").value = hauteur_max;
     document.getElementById("data_hauteur_dangereuse").value = hauteur_dangereuse;
 
@@ -417,6 +438,8 @@ function ouvre_param(premiere=true) {
 function param_ajouter_colis(element, palette=false) {
     document.getElementById("param_bouton_retour_arriere").onclick = function() {
         document.getElementById('parametres').style.display = 'none';
+        document.getElementById("main").style.display = "block";
+        document.getElementById("main").style.animation = "none";
         liste_colis = JSON.parse(localStorage.getItem('CH_liste_colis'));
         palette_infos = JSON.parse(localStorage.getItem('CH_palette_infos'));
     }
@@ -776,6 +799,15 @@ function creation_colis_p1(nouveau_colis) {
             creation_colis_p1(nouveau_colis);
             return;
         }
+        else if (nouveau_colis.nom == "clear") {
+            let suppr = confirm("Voulez vous réinitialiser tous les paramètres ?");
+            if (suppr) {
+                localStorage.clear();
+                sessionStorage.clear();
+                location.href = "index.html";
+                return;
+            }
+        }
         let exist_deja = false;
         for (let i=0; i<liste_colis.length; i++) {
             if (liste_colis[i].nom == nouveau_colis.nom) {
@@ -821,15 +853,13 @@ function creation_colis_p2(nouveau_colis) {
     choix_couleur.setAttribute("type", "color");
     choix_couleur.setAttribute("class", "choix_couleur");
     choix_couleur.setAttribute("id", "param_couleur_change");
-    choix_couleur.onchange = function() {
-        couleur = this.value;
-    }
+    choix_couleur.setAttribute("value", "#FFFFFF");
 
     let btn_valider = document.createElement("button");
     btn_valider.setAttribute("id", "param_valide_change");
     btn_valider.innerHTML = "valider";
     btn_valider.onclick = function() {
-        nouveau_colis.couleur = couleur;
+        nouveau_colis.couleur = document.getElementById("param_couleur_change").value;
         creation_colis_p3(nouveau_colis, 0);
     }
 
@@ -922,6 +952,8 @@ function creation_colis_p3(nouveau_colis, i) {
 function valider_parametres() {
     if (!param_modifie) {
         document.getElementById('parametres').style.display = 'none';
+        document.getElementById("main").style.display = "block";
+        document.getElementById("main").style.animation = "none";
         return;
     }
     palette_infos.longueur = parseInt(palette_infos.longueur);
@@ -960,45 +992,49 @@ function change_hauteur(input) {
     document.getElementById("valider_param").style.borderColor = "green";
 }
 
-
-
-if (session_commandes.length != 0) {
-    for (let i=0; i<session_commandes.length; i++) {
-        status_creation_commande.estOuvert = true;
-        status_creation_commande.nb_colis = parseInt(session_commandes[i][0]);
-        let trouve = false;
-        let index = 0;
-        for (let j=0; j<choix_type_colis.length; j++) {
-            if (choix_type_colis[j] == session_commandes[i][1]) {
-                trouve = true;
-                index = j
-                break;
+function affichage_commandes_memoire() {
+    if (session_commandes.length != 0) {
+        for (let i=0; i<session_commandes.length; i++) {
+            status_creation_commande.estOuvert = true;
+            status_creation_commande.nb_colis = parseInt(session_commandes[i][0]);
+            let trouve = false;
+            let index = 0;
+            for (let j=0; j<choix_type_colis.length; j++) {
+                if (choix_type_colis[j] == session_commandes[i][1]) {
+                    trouve = true;
+                    index = j
+                    break;
+                }
+            }
+            if (trouve) {
+                status_creation_commande.id_colis = index;
+                status_creation_commande.nb_palettes = session_commandes[i][2];
+                terminer_ajout(true);
+            }
+            else {
+                alert("Le colis "+session_commandes[i][1]+" n'existe plus, la commande en mémoire a donc été effacée.");
             }
         }
-        if (trouve) {
-            status_creation_commande.id_colis = index;
-            status_creation_commande.nb_palettes = session_commandes[i][2];
-            terminer_ajout(true);
-        }
-        else {
-            alert("Le colis "+session_commandes[i][1]+" n'existe plus, la commande en mémoire a donc été effacée.");
-        }
+    }
+    else {
+        document.getElementById("titre_page").style.animationDuration = "2s";
+        document.getElementById("titre_page").style.animationName = "animation_entree";
+
+        document.getElementById("bouton_parametre").style.animationDuration = "4s";
+        document.getElementById("bouton_parametre").style.animationName = "apparition_entree";
+
+        document.getElementById("bouton_erase").style.animationDuration = "4s";
+        document.getElementById("bouton_erase").style.animationName = "apparition_entree";
+
+
+        document.getElementById("second_titre").style.animationDuration = "4s";
+        document.getElementById("second_titre").style.animationName = "apparition_entree";
+
+        document.getElementById("main").style.animationDuration = "4s";
+        document.getElementById("main").style.animationName = "apparition_entree";
     }
 }
-else {
-    document.getElementById("titre_page").style.animationDuration = "2s";
-    document.getElementById("titre_page").style.animationName = "animation_entree";
 
-    document.getElementById("bouton_parametre").style.animationDuration = "4s";
-    document.getElementById("bouton_parametre").style.animationName = "apparition_entree";
-
-    document.getElementById("bouton_erase").style.animationDuration = "4s";
-    document.getElementById("bouton_erase").style.animationName = "apparition_entree";
-
-
-    document.getElementById("second_titre").style.animationDuration = "4s";
-    document.getElementById("second_titre").style.animationName = "apparition_entree";
-
-    document.getElementById("main").style.animationDuration = "4s";
-    document.getElementById("main").style.animationName = "apparition_entree";
+function masque_body() {
+    document.getElementById("main").style.display = "none";
 }

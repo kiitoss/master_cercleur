@@ -1,7 +1,7 @@
 // localStorage.clear();
 var hauteur_max = 0;
 var CH_hauteur_max = localStorage.getItem('CH_hauteur_max');
-if (!CH_hauteur_max) {
+if (!CH_hauteur_max || CH_hauteur_max == null || CH_hauteur_max == undefined) {
     hauteur_max = 255;
     localStorage.setItem('CH_hauteur_max', hauteur_max);
 }
@@ -11,7 +11,7 @@ else {
 
 var hauteur_dangereuse = 0;
 var CH_hauteur_dangereuse = localStorage.getItem('CH_hauteur_dangereuse');
-if (!CH_hauteur_dangereuse) {
+if (!CH_hauteur_dangereuse || CH_hauteur_dangereuse == null || CH_hauteur_dangereuse == undefined) {
     hauteur_dangereuse = 245;
     localStorage.setItem('CH_hauteur_dangereuse', hauteur_dangereuse);
 }
@@ -50,7 +50,7 @@ else {
 
 var max_palettes = 0;
 var CH_max_palettes = localStorage.getItem('CH_max_palettes');
-if (!CH_max_palettes) {
+if (!CH_max_palettes || CH_max_palettes == null || CH_max_palettes == undefined) {
     max_palettes = 2;
     localStorage.setItem('CH_max_palettes', max_palettes);
 }

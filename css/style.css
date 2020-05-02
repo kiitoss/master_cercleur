@@ -46,36 +46,17 @@ body {
     margin: auto;
     border-top: thick double white;
     border-bottom: thick double white;
-    /* animation-duration: 2s;
-    animation-name: animation_entree; */
     font-family: 'Indie Flower', cursive;
 }
 
 #second_titre {
     margin-bottom: 7vh;
     font-size: x-large;
-    /* animation-duration: 4s;
-    animation-name: apparition_entree; */
     font-family: 'Courgette', cursive;;
     color: rgb(110, 108, 107);
 }
 
-/* #hauteur_avant_valid {
-    margin: auto;
-    margin-top: 2vh;
-    margin-bottom: 5vh;
-    width: min(70vw, 70vh);
-    line-height: 5vh;
-    height: 5vh;
-    animation-duration: 4s;
-    animation-name: animation_entree;
-} */
 
-
-/* #main {
-    animation-duration: 4s;
-    animation-name: apparition_entree;
-} */
 
 .ligne_commande {
     margin: auto;
@@ -430,7 +411,7 @@ body {
 
 #param_couleur_change {
     width: 12vh;
-    height: 8vh;
+    height: 12vh;
     text-align: center;
     font-size: xx-large;
 }
