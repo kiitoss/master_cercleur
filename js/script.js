@@ -374,9 +374,6 @@ function sauvegarder_commandes_memoire(changement_page=false) {
 
 function ouvre_param(premiere=true) {
     masque_body();
-    // document.getElementById("param_bouton_retour_arriere").onclick = function() {
-    //     document.getElementById("main").style.display = "block";
-    // }
     document.getElementById("param_hauteurs").style.display = "block";
     param_liste_colis = document.getElementById("param_liste_colis");
     while (param_liste_colis.firstChild) {
@@ -396,7 +393,6 @@ function ouvre_param(premiere=true) {
         hauteur_dangereuse = localStorage.getItem('CH_hauteur_dangereuse');
     }
 
-    console.log(hauteur_max);
     document.getElementById("data_hauteur_max").value = hauteur_max;
     document.getElementById("data_hauteur_dangereuse").value = hauteur_dangereuse;
 
