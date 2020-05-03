@@ -12,8 +12,8 @@ var meilleur_placement = null;
 var couleurs_meileur_placement = [
     "red",
     "blue",
-    "green",
     "yellow",
+    "grey",
     "pink",
     "grey",
     "brown",
@@ -21,6 +21,8 @@ var couleurs_meileur_placement = [
     "purple",
     "orange"
 ]
+
+var recursion_max = 1000;
 
 document.getElementById("checkbox_optimiser").checked = false;
 
@@ -288,6 +290,8 @@ function ajout_suppression_commande(commande, auto=false) {
 }
 
 function change_couleur_fond(hauteur_atteinte) {
+    // console.log(hauteur_atteinte);
+    // hauteur_atteinte = parseFloat(parseInt(hauteur_atteinte*100))/100;
     document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte.toFixed(2);
 
     if (hauteur_atteinte > hauteur_max) {
@@ -361,6 +365,9 @@ function clique_optimisation(mouse_clique=true) {
             parent.removeChild(parent.lastChild);
         }
         fusion_colis_identiques(old_commande);
+        // for (let i=0; i<old_commande.length; i++) {
+        //     affecte_hauteurs_couleur(old_commande[i]);
+        // }
     }
     else {
         document.getElementById("voir_detail").style.display = "none";
@@ -407,7 +414,7 @@ function tri_commandes(liste_commandes, liste_triee) {
     }
 }
 
-function optimise_reste(old_commande) {
+function optimise_reste(old_commande, cherche_meilleur=false) {
     AP_liste_colis = [];
     for (let i=0; i<old_commande.length; i++) {
         if (old_commande[i].reste > 0) {
@@ -439,27 +446,47 @@ function optimise_reste(old_commande) {
         AP_liste_colis = [];
     }
 
-    
-    old_commande = tri_commandes(old_commande, []);
-    for (let i=old_commande.length-1; i>-1; i--) {
-        affecte_hauteurs_couleur(old_commande[i]);
-        creation_dessin_commande(old_commande[i]);
-    }
-    for (let i=0; i<old_commande.length; i++) {
-        ajout_suppression_commande(old_commande[i], true);
-    }
-
-    if (AP_liste_colis.length > 0) {
-        AP_first_main();
-        if (AP_result.length != []) {
-            creation_top(AP_result);
-            creation_detail(AP_liste_colis);
+    if (!cherche_meilleur) {
+        old_commande = tri_commandes(old_commande, []);
+        for (let i=old_commande.length-1; i>-1; i--) {
+            affecte_hauteurs_couleur(old_commande[i]);
+            creation_dessin_commande(old_commande[i]);
         }
-        else {
-            alert("Aucune solution trouvée.");
-            document.getElementById("checkbox_optimiser").checked = false;
-            clique_optimisation(true);
+        for (let i=0; i<old_commande.length; i++) {
+            ajout_suppression_commande(old_commande[i], true);
         }
+        if (AP_liste_colis.length > 0) {
+            AP_first_main();
+            if (AP_result.length != []) {
+                creation_top(AP_result);
+                creation_detail(AP_liste_colis);
+            }
+            else {
+                alert("Aucune solution trouvée.");
+                document.getElementById("checkbox_optimiser").checked = false;
+                clique_optimisation(true);
+            }
+        }
+    }
+    else {
+        for (let i=old_commande.length-1; i>-1; i--) {
+            affecte_hauteurs_couleur(old_commande[i]);
+        }
+        let hauteur_actuelle = 0;
+        for (let i=0; i<old_commande.length; i++) {
+            hauteur_actuelle += old_commande[i].hauteur_total;
+        }
+        if (AP_liste_colis.length > 0) {
+            AP_first_main();
+            if (AP_result.length != []) {
+                hauteur_actuelle += creation_top(AP_result, cherche_meilleur);
+            }
+            else {
+                alert("Aucune solution trouvée.");
+                location.reload();
+            }
+        }
+        return hauteur_actuelle;
     }
 }
 
@@ -473,9 +500,58 @@ function voir_detail() {
     }
 }
 
-function creation_top(palette) {
+function creation_top(palette, cherche_meilleur=false) {
     let hauteur_max_reste = 0;
     let colis_reste = null;
+    let aire_palette = 0;
+    let colis_palette = [];
+    for (let j=0; j<palette.length; j++) {
+        for (let i=0; i<palette[j].length; i++) {
+            if (palette[j][i] == 0) {
+                continue;
+            }
+            let deja_present = false;
+            let colis = palette[j][i];
+            for (let k=0; k<colis_palette.length; k++) {
+                if (colis_palette[k][0] == colis[0]) {
+                    deja_present = true;
+                    break;
+                }
+            }
+            if (!deja_present) {
+                let delta_x = 0;
+                while ((delta_x+i < palette[j].length) && palette[j][delta_x+i][0] == colis[0]) {
+                    delta_x++;
+                }
+                let delta_y = 0;
+                while ((delta_y+j < palette.length) && palette[j+delta_y][i][0] == colis[0]) {
+                    delta_y++;
+                }
+                let couleur = "none";
+                let hauteur_colis = 0;
+                for (let k=0; k<liste_colis.length; k++) {
+                    if (liste_colis[k].nom == colis[1]) {
+                        if (liste_colis[k].hauteur*colis[2] > hauteur_max_reste) {
+                            colis_reste = liste_colis[k];
+                            hauteur_max_reste = liste_colis[k].hauteur*colis[2];
+                        }
+                        couleur = liste_colis[k].couleur;
+                        hauteur_colis = liste_colis[k].hauteur;
+                        break;
+                    }
+                }
+                colis_palette.push([colis[0], colis[1], colis[2], j, i, delta_x, delta_y, couleur, hauteur_colis]);
+                aire_palette +=  delta_x * delta_y * colis[2];
+            }
+        }
+    }
+
+    hauteur_max_reste += palette_infos.hauteur;
+
+    if (cherche_meilleur) {
+        return hauteur_max_reste;
+    }
+
 
     let canvas_dessin = document.getElementById("voir_plus_opti");
     document.getElementById("section_detail").style.display = "block";
@@ -528,50 +604,7 @@ function creation_top(palette) {
     canvas_dessin.appendChild(dessin_palette);
 
 
-    let aire_palette = 0;
-    let colis_palette = [];
-    for (let j=0; j<palette.length; j++) {
-        for (let i=0; i<palette[j].length; i++) {
-            if (palette[j][i] == 0) {
-                continue;
-            }
-            let deja_present = false;
-            let colis = palette[j][i];
-            for (let k=0; k<colis_palette.length; k++) {
-                if (colis_palette[k][0] == colis[0]) {
-                    deja_present = true;
-                    break;
-                }
-            }
-            if (!deja_present) {
-                let delta_x = 0;
-                while ((delta_x+i < palette[j].length) && palette[j][delta_x+i][0] == colis[0]) {
-                    delta_x++;
-                }
-                let delta_y = 0;
-                while ((delta_y+j < palette.length) && palette[j+delta_y][i][0] == colis[0]) {
-                    delta_y++;
-                }
-                let couleur = "none";
-                let hauteur_colis = 0;
-                for (let k=0; k<liste_colis.length; k++) {
-                    if (liste_colis[k].nom == colis[1]) {
-                        if (liste_colis[k].hauteur*colis[2] > hauteur_max_reste) {
-                            colis_reste = liste_colis[k];
-                            hauteur_max_reste = liste_colis[k].hauteur*colis[2];
-                        }
-                        couleur = liste_colis[k].couleur;
-                        hauteur_colis = liste_colis[k].hauteur;
-                        break;
-                    }
-                }
-                colis_palette.push([colis[0], colis[1], colis[2], j, i, delta_x, delta_y, couleur, hauteur_colis]);
-                aire_palette +=  delta_x * delta_y * colis[2];
-            }
-        }
-    }
-
-    hauteur_max_reste += palette_infos.hauteur;
+    
 
     
 
@@ -697,6 +730,10 @@ function fusion_colis_identiques(old_commande) {
             old_commande[i].delta_nb_palettes = -old_commande[i].nb_palettes;
         }
     }
+
+    for (let i=0; i<old_commande.length; i++) {
+        affecte_hauteurs_couleur(old_commande[i]);
+    }
 }
 
 function creation_detail(restes) {
@@ -762,16 +799,23 @@ function creation_detail(restes) {
 }
 
 function calcul_meilleur_possibilite() {
-    ajoute_palette([[]], 0, copie_liste_objets(liste_commandes));
+    let cp_liste_commandes = copie_liste_objets(liste_commandes)
+    ajoute_palette([[]], 0, cp_liste_commandes);
+    console.log(meilleur_placement);
     for (let j=0; j<meilleur_placement.length; j++) {
         let couleur = couleurs_meileur_placement[j%couleurs_meileur_placement.length];
         for (let i=0; i<meilleur_placement[j].length; i++) {
             document.getElementById("ajout_suppr_commande_"+meilleur_placement[j][i].id).style.borderColor = couleur;
         }
     }
+    // commandes_places = [];
 }
 
 function ajoute_palette(palettes_au_sol, index_palette, a_placer) {
+    // recursion_max--;
+    // if (recursion_max<=0) {
+    //     return;
+    // }
     if (meilleur_placement != null && palettes_au_sol.length > meilleur_placement.length) {
         return;
     }
@@ -791,14 +835,30 @@ function ajoute_palette(palettes_au_sol, index_palette, a_placer) {
         for (let k=0; k<cp_liste_palettes[index_palette].length; k++) {
             hauteur_atteinte += cp_liste_palettes[index_palette][k].hauteur_total;
         }
-        if (hauteur_atteinte < hauteur_max) {
+        if (hauteur_atteinte <= hauteur_max) {
             ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
         }
         else {
-            let commande_non_place = cp_liste_palettes[index_palette].splice(cp_liste_palettes[index_palette].length - 1, 1);
-            cp_liste_palettes.push(commande_non_place);
-            ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
-            ajoute_palette(cp_liste_palettes, index_palette+1, cp_a_placer);
+            fusion_colis_identiques(cp_liste_palettes[index_palette]);
+            let hauteur_atteinte = 0;
+            for (let k=0; k<cp_liste_palettes[index_palette].length; k++) {
+                hauteur_atteinte += cp_liste_palettes[index_palette][k].hauteur_total;
+            }
+            if (hauteur_atteinte <= hauteur_max) {
+                ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
+            }
+            else {
+                hauteur_amelioree = optimise_reste(cp_liste_palettes[index_palette], true);
+                if (hauteur_amelioree <= hauteur_max) {
+                    ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
+                }
+                else {
+                    let commande_non_place = cp_liste_palettes[index_palette].splice(cp_liste_palettes[index_palette].length - 1, 1);
+                    cp_liste_palettes.push(commande_non_place);
+                    ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
+                    ajoute_palette(cp_liste_palettes, index_palette+1, cp_a_placer);
+                }
+            }
         }
     }
 }
