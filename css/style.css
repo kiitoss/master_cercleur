@@ -161,7 +161,6 @@ body {
     text-align: center;
     font-size: xx-large;
     margin-top: 15vh;
-    /* margin-left: 0px; */
     position: relative;
     left: 0;
 }
@@ -231,8 +230,6 @@ body {
     background-size: 30px 30px;
     background-repeat: no-repeat;
     background-position: center;
-    /* animation-duration: 4s;
-    animation-name: apparition_entree; */
     position: absolute;
     top: 0;
     right: 0;
@@ -461,8 +458,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    /* animation-duration: 4s;
-    animation-name: apparition_entree; */
+
 }
 
 #param_hauteurs {
@@ -472,26 +468,24 @@ body {
 #param_hauteurs>div {
     display: flex;
     flex-direction: row;
-    width: 75%;
-    margin-right: auto;
+    width: min(100vw, 100vh);
 }
 
 .label_hauteur {
-    flex: 2;
     text-align: right;
     height: 5vh;
     line-height: 5vh;
+    width: min(50vw, 50vh);
 
 }
 
 .data_hauteur {
-    flex: 1;
     text-align: center;
-    /* height: 2vh; */
     width: min(20vw, 20vh);
     height: 5vh;
     border-radius: 10px;
     margin-left: 4px;
     font-size: large;
+    
 }
 

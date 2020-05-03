@@ -377,6 +377,7 @@ function clique_optimisation(mouse_clique=true) {
         optimise_reste(old_commande);
     }
     else {
+        old_commande = tri_commandes(old_commande, []);
         for (let i=old_commande.length-1; i>-1; i--) {
             affecte_hauteurs_couleur(old_commande[i]);
             creation_dessin_commande(old_commande[i]);
@@ -384,6 +385,25 @@ function clique_optimisation(mouse_clique=true) {
         for (let i=0; i<old_commande.length; i++) {
             ajout_suppression_commande(old_commande[i], true);
         }
+    }
+}
+
+function tri_commandes(liste_commandes, liste_triee) {
+    if (liste_commandes.length == 0) {
+        return liste_triee;
+    }
+    else {
+        let maximum = 0;
+        let index_max = 0;
+        for (let i=0; i<liste_commandes.length; i++) {
+            if (liste_commandes[i].nb_colis + liste_commandes[i].delta_nb_colis >= maximum) {
+                maximum = liste_commandes[i].nb_colis + liste_commandes[i].delta_nb_colis;
+                index_max = i;
+            }
+        }
+        liste_triee.push(liste_commandes[index_max]);
+        liste_commandes.splice(index_max, 1);
+        return tri_commandes(liste_commandes, liste_triee);
     }
 }
 
@@ -420,7 +440,7 @@ function optimise_reste(old_commande) {
     }
 
     
-
+    old_commande = tri_commandes(old_commande, []);
     for (let i=old_commande.length-1; i>-1; i--) {
         affecte_hauteurs_couleur(old_commande[i]);
         creation_dessin_commande(old_commande[i]);
