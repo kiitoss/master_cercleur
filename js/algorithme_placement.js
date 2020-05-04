@@ -2,7 +2,7 @@
 var AP_palette_place_vide = 0;
 var AP_meilleur_palette = [];
 var compteur_recursion = 0;
-var max_recursion = 100000;
+var max_recursion = 1000000;
 
 // Initialisation des variables.
 var AP_hauteur_max = 0;
@@ -114,7 +114,6 @@ function AP_change_hauteur_max() {
         }
     
         if (palette_vide) {
-            console.log("Aucune solution trouvée.");
             AP_affichage_palette(false);
         }
         else {
@@ -260,9 +259,9 @@ function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_i
     }
 
     if (!AP_placement_ok) {
-        if (compteur_recursion > max_recursion) {
-            return;
-        }
+        // if (compteur_recursion > max_recursion) {
+        //     return;
+        // }
         for (let j=0; j<test_palette.length - colis.largeur + 1; j++) {
             for (let i=0; i<test_palette[j].length - colis.longueur + 1; i++) {
                 free_position = true;
@@ -326,7 +325,6 @@ function AP_tri_hauteur(new_liste_colis_modifie) {
 function AP_affichage_palette(placement_trouve=true) {
     if (!placement_trouve) {
         AP_result = [];
-        console.log([]);
         return;
     }
     AP_result = AP_palette;

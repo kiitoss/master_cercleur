@@ -22,7 +22,14 @@ var couleurs_meileur_placement = [
     "orange"
 ]
 
-var recursion_max = 1000;
+// var recursion_max = 10000;
+
+
+var possibilite = [];
+var mes_palettes = [];
+var min_palettes = null;
+var meilleur_arrangement = null;
+
 
 document.getElementById("checkbox_optimiser").checked = false;
 
@@ -482,8 +489,8 @@ function optimise_reste(old_commande, cherche_meilleur=false) {
                 hauteur_actuelle += creation_top(AP_result, cherche_meilleur);
             }
             else {
-                alert("Aucune solution trouvée.");
-                location.reload();
+                return null;
+                // location.reload();
             }
         }
         return hauteur_actuelle;
@@ -798,27 +805,164 @@ function creation_detail(restes) {
     document.getElementById("voir_detail").style.display = "block";
 }
 
+
+
+
+
+
+
+
+
+
 function calcul_meilleur_possibilite() {
-    let cp_liste_commandes = copie_liste_objets(liste_commandes)
-    ajoute_palette([[]], 0, cp_liste_commandes);
-    console.log(meilleur_placement);
-    for (let j=0; j<meilleur_placement.length; j++) {
-        let couleur = couleurs_meileur_placement[j%couleurs_meileur_placement.length];
-        for (let i=0; i<meilleur_placement[j].length; i++) {
-            document.getElementById("ajout_suppr_commande_"+meilleur_placement[j][i].id).style.borderColor = couleur;
-        }
-    }
-    // commandes_places = [];
+    let cp_liste_commandes = copie_liste(liste_commandes);
+    // console.log(cp_liste_commandes);
+    // combi([], cp_liste_commandes);
+    // console.log(possibilite);
+    // for (let i=0; i<possibilite.length; i++) {
+    //     if (possibilite[i].length == liste_commandes.length) {
+    //         meilleur_arrangement = [possibilite[i]];
+    //         break;
+    //     }
+    //     merge_listes(possibilite[i]);
+    // }
+    // console.log(meilleur_arrangement);
 }
 
-function ajoute_palette(palettes_au_sol, index_palette, a_placer) {
-    // recursion_max--;
-    // if (recursion_max<=0) {
-    //     return;
-    // }
-    if (meilleur_placement != null && palettes_au_sol.length > meilleur_placement.length) {
+
+
+
+function combi(liste0, liste) {
+    for (let i=0; i<liste.length; i++) {
+        let cp_liste0 = copie_liste(liste0);
+        let cp_liste = copie_liste(liste);
+        cp_liste.splice(0,i+1);
+
+        let hauteur = 0;
+        for (let k=0; k<cp_liste0.length; k++) {
+            hauteur += cp_liste0[k].hauteur_total;
+        }
+        hauteur += liste[i].hauteur_total;
+        console.log(hauteur);
+        if (hauteur <= hauteur_max) {
+            cp_liste0.push(liste[i]);
+            ajoute_combi(cp_liste0, cp_liste);
+
+            combi(cp_liste0, cp_liste);
+        }
+    }    
+}
+
+function copie_liste(liste) {
+    let new_liste = [];
+    for (let i=0; i<liste.length; i++) {
+        new_liste.push(JSON.parse(JSON.stringify(liste[i])));
+    }
+    return new_liste;
+}
+
+function ajoute_combi(liste, reste) {
+    let result = [];
+    for (let i=0; i<liste.length; i++) {
+        result.push(liste[i].nom);
+    }
+    possibilite.push(result);
+}
+
+function merge_listes(mes_palettes) {
+    let total_commandes = 0;
+    let total_palettes = 0;
+    for (let i=0; i<mes_palettes.length; i++) {
+        total_palettes++;
+        for (let j=0; j<mes_palettes[i].length; j++) {
+            total_commandes++;
+        }
+    }
+
+
+    if (total_commandes == ma_liste.length) {
+        if (min_palettes == null || total_palettes < min_palettes) {
+            min_palettes = total_palettes;
+            meilleur_arrangement = mes_palettes;
+        }
         return;
     }
+    else if(min_palettes != null && total_palettes >= min_palettes) {
+        return;
+    }
+
+    let copie_ma_liste = copie_liste(ma_liste);
+    let elements_presents = [];
+    for (let i=0; i<mes_palettes.length; i++) {
+        for (j=0; j<mes_palettes[i].length; j++) {
+            elements_presents.push(mes_palettes[i][j]);
+            for (let k=0; k<elements_presents.length; k++) {
+                for (l=0; l<copie_ma_liste.length; l++) {
+                    if (copie_ma_liste[l].nom == elements_presents[k]) {
+                        copie_ma_liste.splice(l, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    for (let k=0; k<copie_ma_liste.length; k++) {
+        let contient_commande = [];
+        for (let l=0; l<possibilite.length; l++) {
+            for (m=0; m<possibilite[l].length; m++) {
+                if (possibilite[l][m] == copie_ma_liste[k].nom) {
+                    contient_commande.push(possibilite[l]);
+                    break;
+                }
+            }
+        }
+
+        for (let l=0; l<contient_commande.length; l++) {
+            let deja_present = false;
+            let m=0;
+            while (m < contient_commande[l].length) {
+                for (let n=0; n<elements_presents.length; n++) {
+                    if (elements_presents[n] == contient_commande[l][m]) {
+                        deja_present = true;
+                        break;
+                    }
+                }
+                if (deja_present) {
+                    break;
+                }
+                m++;
+            }
+            if (!deja_present) {
+                let copie_mes_palettes = [];
+                for (let m=0; m<mes_palettes.length; m++) {
+                    copie_mes_palettes.push([]);
+                    for (let n=0; n<mes_palettes[m].length; n++) {
+                        copie_mes_palettes[m].push(mes_palettes[m][n]);
+                    }
+                }
+                copie_mes_palettes.push(contient_commande[l]);
+                merge_listes(copie_mes_palettes);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+function ajoute_palette(palettes_au_sol, index_palette, a_placer) {
+    recursion_max--;
+    if (recursion_max<=0) {
+        return;
+    }
+    if ((meilleur_placement != null) && (palettes_au_sol.length >= meilleur_placement.length)) {
+        return;
+    }
+    
 
     if (a_placer.length == 0 && (meilleur_placement == null || palettes_au_sol.length < meilleur_placement.length)) {
         meilleur_placement = palettes_au_sol;
@@ -849,7 +993,7 @@ function ajoute_palette(palettes_au_sol, index_palette, a_placer) {
             }
             else {
                 hauteur_amelioree = optimise_reste(cp_liste_palettes[index_palette], true);
-                if (hauteur_amelioree <= hauteur_max) {
+                if (hauteur_amelioree != null && hauteur_amelioree <= hauteur_max) {
                     ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
                 }
                 else {
@@ -881,3 +1025,8 @@ function copie_palettes(liste_palettes) {
     }
     return liste_copiee;
 }
+
+
+
+
+
