@@ -1,162 +1,150 @@
-let ma_liste = [new myItem("A", 50), new myItem("B", 55), new myItem("C", 55), new myItem("D", 55), new myItem("E", 55), new myItem("F", 50), new myItem("G", 10), new myItem("H", 10), new myItem("I", 10), new myItem("J", 10)];
-let possibilite = [];
-let hauteur_max = 250;
+var liste_commandes = [new myItem("A", 245), new myItem("B", 2), new myItem("C", 3), new myItem("D", 105), new myItem("E", 55), new myItem("F", 50), new myItem("G", 10), new myItem("H", 10), new myItem("I", 10), new myItem("J", 10)];
+var hauteur_max = 250;
+var min_palettes = null;
+var meilleur_agencement = null;
 
-var mes_palettes = [];
 
 function myItem(nom, hauteur) {
     this.nom = nom;
     this.hauteur = hauteur;
 }
 
-var min_palettes = null;
-var meilleur_arrangement = null;
 
-var recursion = 0;
-
-function combi(liste0, liste) {
-    for (let i=0; i<liste.length; i++) {
-        let cp_liste0 = copie_liste(liste0);
-        let cp_liste = copie_liste(liste);
-        cp_liste.splice(0,i+1);
-
-        let hauteur = 0;
-        for (let k=0; k<cp_liste0.length; k++) {
-            hauteur += cp_liste0[k].hauteur;
+// Retourne une liste de toutes les combinaisons possibles d'empilements de commandes.
+function trouve_possible(commandes_places, reste, valides) {
+    for (let i=0; i<reste.length; i++){
+        let cp_commandes_places = copie_liste_palettes(commandes_places);
+        let cp_reste = copie_reste(reste);
+        cp_reste.splice(0, i+1);
+        cp_commandes_places.push(reste[i]);
+        let hauteur_accepte = test_hauteur(cp_commandes_places);
+        if (hauteur_accepte) {
+            valides.push(cp_commandes_places);
+            trouve_possible(cp_commandes_places, cp_reste, valides);
         }
-        hauteur += liste[i].hauteur;
-        if (hauteur <= hauteur_max) {
-            cp_liste0.push(liste[i]);
-            ajoute_combi(cp_liste0, cp_liste);
+    }
+    return valides;
 
-            combi(cp_liste0, cp_liste);
-        }
-    }    
 }
 
-function copie_liste(liste) {
-    let new_liste = [];
-    for (let i=0; i<liste.length; i++) {
-        new_liste.push(JSON.parse(JSON.stringify(liste[i])));
+// Test la condition d'empilement (ici, < hauteur_max).
+function test_hauteur(commandes) {
+    let hauteur = 0;
+    for (let i=0; i<commandes.length; i++) {
+        hauteur += commandes[i].hauteur; 
+        if (hauteur > hauteur_max) {
+            return false;
+        }
     }
-    return new_liste;
+    return true;
 }
 
-function ajoute_combi(liste, reste) {
-    let result = [];
-    for (let i=0; i<liste.length; i++) {
-        result.push(JSON.parse(JSON.stringify(liste[i])));
+// Vérifie que toutes les commandes d'origine sont inférieure à la hauteur_max.
+// Si toutes les commandes peuvent être empilées ensemble retourne 2 pour éviter de lancer l'algorithme.
+function verifie_commandes_ok() {
+    let hauteur_totale = 0;
+    for (let i=0; i<liste_commandes.length; i++) {
+        hauteur_totale += liste_commandes.hauteur;
+        if (liste_commandes[i].hauteur > hauteur_max) {
+            return 0;
+        }
     }
-    possibilite.push(result);
+    if (hauteur_totale < hauteur_max) {
+        return 2
+    }
+    return 1;
 }
 
-function merge_listes(mes_palettes) {
-    recursion++;
-    if (recursion%10000 == 0) {
-        console.log(recursion/10000);
-    }
-    let index = 0;
-    while(index < mes_palettes.length) {
-        if (mes_palettes[index].length == 0) {
-            mes_palettes.splice(index, 1);
-            continue;
-        }
-        index++;
-    }
-    let total_commandes = 0;
-    let total_palettes = 0;
-    for (let i=0; i<mes_palettes.length; i++) {
-        total_palettes++;
-        for (let j=0; j<mes_palettes[i].length; j++) {
-            total_commandes++;
-        }
-    }
 
-
-    if (total_commandes == ma_liste.length) {
-        if (min_palettes == null || total_palettes < min_palettes) {
-            min_palettes = total_palettes;
-            meilleur_arrangement = mes_palettes;
-        }
+// Trouve le meilleur empilement par récursion.
+// Si une combinaison a déjà été trouvé et que la combinaison en cours de recherche est moins avantageuse,
+// (si le nombre de palettes au sol est supérieur), la recherche pour cette combinaison est arretée.
+function trouve_meilleur(liste_palettes, reste) {
+    if (min_palettes != null && liste_palettes.length >= min_palettes) {
         return;
     }
-    else if(min_palettes != null && total_palettes >= min_palettes) {
+    let total_commandes = compte_commandes(liste_palettes);
+    if (total_commandes == liste_commandes.length && (min_palettes == null || liste_palettes.length < min_palettes)) {
+        min_palettes = liste_palettes.length;
+        meilleur_agencement = liste_palettes;
         return;
     }
 
-    let copie_ma_liste = copie_liste(ma_liste);
-    let elements_presents = [];
-    for (let i=0; i<mes_palettes.length; i++) {
-        for (j=0; j<mes_palettes[i].length; j++) {
-            elements_presents.push(JSON.parse(JSON.stringify(mes_palettes[i][j])));
-            for (let k=0; k<elements_presents.length; k++) {
-                for (l=0; l<copie_ma_liste.length; l++) {
-                    // console.log(JSON.stringify(elements_presents[k]));
-                    if (JSON.stringify(copie_ma_liste[l]) == JSON.stringify(elements_presents[k])) {
-                        copie_ma_liste.splice(l, 1);
-                        break;
-                    }
+    let new_reste = copie_reste(reste);
+    let liste_possibilites = trouve_possible(reste[0], new_reste, []);
+    for (let i=0; i<liste_possibilites.length; i++) {
+        let cp_liste_palettes = copie_liste_palettes(liste_palettes);
+        let cp_reste = copie_reste(reste, liste_possibilites[i]);
+        cp_liste_palettes.push(liste_possibilites[i]);
+        for (let j=0; j<liste_possibilites[i].length; j++) {
+            let k=0;
+            while (k<cp_reste.length) {
+                if (liste_possibilites[i][j] == cp_reste[k]) {
+                    cp_reste.splice(k, 1);
+                    continue;
                 }
+                k++;
             }
         }
-    }
-
-
-    for (let k=0; k<copie_ma_liste.length; k++) {
-        let contient_commande = [];
-        for (let l=0; l<possibilite.length; l++) {
-            for (m=0; m<possibilite[l].length; m++) {
-                if (JSON.stringify(possibilite[l][m]) == JSON.stringify(copie_ma_liste[k])) {
-                    contient_commande.push(JSON.parse(JSON.stringify(possibilite[l])));
-                    break;
-                }
-            }
-        }
-
-        for (let l=0; l<contient_commande.length; l++) {
-            let deja_present = false;
-            let m=0;
-            while (m < contient_commande[l].length) {
-                for (let n=0; n<elements_presents.length; n++) {
-                    if (JSON.stringify(elements_presents[n]) == JSON.stringify(contient_commande[l][m])) {
-                        deja_present = true;
-                        break;
-                    }
-                }
-                if (deja_present) {
-                    break;
-                }
-                m++;
-            }
-            if (!deja_present) {
-                let copie_mes_palettes = [];
-                for (let m=0; m<mes_palettes.length; m++) {
-                    copie_mes_palettes.push([]);
-                    for (let n=0; n<mes_palettes[m].length; n++) {
-                        copie_mes_palettes[m].push(JSON.parse(JSON.stringify(mes_palettes[m][n])));
-                    }
-                }
-                copie_mes_palettes.push(JSON.parse(JSON.stringify(contient_commande[l])));
-                merge_listes(copie_mes_palettes);
-            }
-        }
+        trouve_meilleur(cp_liste_palettes, cp_reste);
     }
 }
 
-function main(ma_liste) {
-    combi([], ma_liste);
-    // console.log(possibilite);
-    for (let i=0; i<possibilite.length; i++) {
-        if (possibilite[i].length == ma_liste.length) {
-            meilleur_arrangement = [possibilite[i]];
-            break;
+// Compte le nombre de commandes incluses dans la liste des palettes.
+function compte_commandes(liste_palettes) {
+    let qte = 0;
+    for (let j=0; j<liste_palettes.length; j++) {
+        for (let i=0; i<liste_palettes[j].length; i++) {
+            qte++;
         }
     }
-    // merge_listes(possibilite[1]);
-    // console.log(meilleur_arrangement);
-    for (let i=0; i<possibilite.length; i++) {
-        console.log(possibilite[i]);
-    }
+    return qte;
 }
 
-main(ma_liste);
+
+// Copie la liste de palettes.
+function copie_liste_palettes(liste_palettes) {
+    let copie = [];
+    for (let i=0; i<liste_palettes.length; i++) {
+        copie.push(liste_palettes[i]);
+    }
+    return copie;
+}
+
+
+// Copie la liste des restes.
+function copie_reste(reste, commandes=[]) {
+    let copie = [];
+    for (let i=0; i<reste.length; i++) {
+        let deja_place = false;
+        for (let j=0; j<commandes.length; j++) {
+            if (reste[i] == commandes[j]) {
+                deja_place = true;
+                break;
+            }
+        }
+        if (!deja_place) {
+            copie.push(reste[i]);
+        }
+    }
+    return copie;
+}
+
+// Vérifie que les commandes d'origine ne dépassent pas la hauteur_max,
+// Vérifie s'il est possible de tout empiler en une seule palette,
+// Sinon lance la recherche de la meilleur possibilitée.
+function main() {
+    let commandes_valides = verifie_commandes_ok();
+    if (commandes_valides == 0) {
+        console.log("commandes de taille supérieure à la taille maximale");
+        return;
+    }
+    else if (commandes_valides == 2) {
+        console.log("Tout rentre");
+        return;
+    }
+    trouve_meilleur([], liste_commandes);
+    console.log(meilleur_agencement);
+}
+
+main();

@@ -1,6 +1,6 @@
 let ma_liste = [new myItem("A", 50), new myItem("B", 55), new myItem("C", 55), new myItem("D", 55), new myItem("E", 55), new myItem("F", 50), new myItem("G", 10), new myItem("H", 10), new myItem("I", 10), new myItem("J", 10)];
 // let ma_liste = [new myItem("A", 50), new myItem("B", 55), new myItem("C", 55), new myItem("D", 55), new myItem("E", 10), new myItem("F", 10)];
-
+// JSON.parse(JSON.stringify(mes_palettes[m][n]))
 let possibilite = [];
 let hauteur_max = 105;
 
