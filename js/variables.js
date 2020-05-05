@@ -37,10 +37,10 @@ if (!CH_liste_colis) {
         new TypeColis("cagette bois", 1, 1, 12.3, rgb_to_hex(222,184,135)),
         new TypeColis("COGIT", 2, 1, 10.4, rgb_to_hex(0,100,0)),
         new TypeColis("IFCO (petit)", 2, 1, 11.5, rgb_to_hex(0,255,0)),
-        new TypeColis("Carton noir", 2, 1, 10.73, rgb_to_hex(10, 10, 10)),
+        new TypeColis("carton noir", 2, 1, 10.73, rgb_to_hex(50, 50, 50)),
         new TypeColis("IFCO (grand)", 2, 1, 18.5, rgb_to_hex(0,255,0)),
-        new TypeColis("Carton rouge", 1, 1, 12, rgb_to_hex(255, 0, 0)),
-        new TypeColis("Carton blanc", 2, 1, 17.33, rgb_to_hex(255, 255, 255))
+        new TypeColis("carton rouge", 1, 1, 12, rgb_to_hex(255, 0, 0)),
+        new TypeColis("carton blanc", 2, 1, 17.33, rgb_to_hex(255, 255, 255))
     ];
     localStorage.setItem('CH_liste_colis', JSON.stringify(liste_colis));
 }

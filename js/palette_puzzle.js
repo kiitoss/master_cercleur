@@ -32,6 +32,7 @@ var meilleur_agencement = null;
 var AC_liste_commandes = [];
 
 
+
 document.getElementById("checkbox_optimiser").checked = false;
 
 // Récupération des variables stockées en local.
@@ -53,6 +54,17 @@ else {
 function main() {
     for (let i=0; i<commande_recues.length; i++) {
         liste_commandes.push(new Commande(i, commande_recues[i][0], commande_recues[i][1], commande_recues[i][2]));
+    }
+
+    let boutons_cliquables = document.getElementsByClassName("commande_cliquable");
+    let btn_max_width = 0;
+    for (let i=0; i<boutons_cliquables.length; i++) {
+        if (boutons_cliquables[i].offsetWidth > btn_max_width) {
+            btn_max_width = boutons_cliquables[i].offsetWidth;
+        }
+    }
+    for (let i=0; i<boutons_cliquables.length; i++) {
+        boutons_cliquables[i].style.width = btn_max_width+"px";
     }
 
     affiche_barres_max_danger();
@@ -126,7 +138,7 @@ function creer_bouton_commande(commande) {
     nouvelle_commande.onclick = function() {
         ajout_suppression_commande(commande)
     };
-    nouvelle_commande.innerHTML = commande.nb_colis;
+    nouvelle_commande.innerHTML = commande.nb_colis+"<br/><span class='nom_colis_bouton'>"+commande.infos_colis.nom+"</span>";
     choix_commandes.appendChild(nouvelle_commande);
 }
 
@@ -860,18 +872,22 @@ function trouve_possible(commandes_places, reste, valides) {
 function test_hauteur(commandes) {
     let hauteur = 0;
     for (let i=0; i<commandes.length; i++) {
-        hauteur += commandes[i].hauteur_total; 
+        hauteur += commandes[i].hauteur_total;
         if (hauteur > hauteur_max) {
-            fusion_colis_identiques(commandes);
-            let hauteur = 0;
-            for (let k=0; k<commandes.length; k++) {
-                hauteur +=commandes[k].hauteur_total;
+            let cp_commandes = copie_commandes(commandes);
+            fusion_colis_identiques(cp_commandes);
+            
+            hauteur = 0;
+            for (let k=0; k<cp_commandes.length; k++) {
+                hauteur +=cp_commandes[k].hauteur_total;
             }
+            
             if (hauteur <= hauteur_max) {
                 return true;
             }
             else {
-                hauteur = optimise_reste(commandes, true);
+                hauteur = optimise_reste(cp_commandes, true);
+                
                 if (hauteur != null && hauteur <= hauteur_max) {
                     return true;
                 }
@@ -881,6 +897,7 @@ function test_hauteur(commandes) {
             }
         }
     }
+
     return true;
 }
 

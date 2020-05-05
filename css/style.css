@@ -46,13 +46,13 @@ body {
     margin: auto;
     border-top: thick double white;
     border-bottom: thick double white;
-    font-family: 'Indie Flower', cursive;
+    font-family: 'Josefin Slab', serif;
 }
 
 #second_titre {
     margin-bottom: 7vh;
     font-size: x-large;
-    font-family: 'Courgette', cursive;;
+    font-family: 'Satisfy', cursive;
     color: rgb(110, 108, 107);
 }
 
@@ -123,7 +123,7 @@ body {
 #ac_titre_ajout_commande {
     line-height: 15vh;
     margin: auto auto 5vh;
-    font-family: 'Indie Flower', cursive;
+    font-family: 'Josefin Slab', serif;
 }
 
 #ac_bouton_retour_arriere {

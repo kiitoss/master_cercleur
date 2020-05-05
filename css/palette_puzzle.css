@@ -47,12 +47,17 @@ body {
 
 .commande_cliquable {
     display: table-cell;
-    width: min(15vw, 15vh);
+    /* width: min(15vw, 15vh); */
     background-color: white;
     border: 3px solid white;
     color: black;
     border-radius: 10px;
-    height: 4vh;
+    /* height: 5vh; */
+    padding: 5px;
+}
+
+.nom_colis_bouton {
+    font-size: x-small;
 }
 
 
@@ -143,6 +148,12 @@ body {
     position: absolute;
     bottom: 0;
     right: min(5vw, 5vh);
+    border-radius: 10px;
+    width: min(15vw, 15vh);
+    height: 5vh;
+    background-color: white;
+    border-color: white;
+    color: black;
 }
 
 
@@ -235,12 +246,14 @@ body {
     top: 50vh;
     width: min(100vw, 100vh);
     height: 50vh;
+    color: black;
 }
 
 
 #dessin_palette_top {
     border: 1px solid black;
     position: relative;
+    margin: auto;
 }
 
 .colis_top {

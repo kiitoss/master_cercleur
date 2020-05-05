@@ -157,8 +157,7 @@ function creation_commande_p1(commande_id=null) {
     else if (status_creation_commande.nb_colis != null) {
         document.getElementById("ac_input_colis").value = status_creation_commande.nb_colis;
     }
-    document.getElementById("ac_input_colis").focus()
-
+    
     // Affectation de la valeur onclick au bouton ac_bouton_valider.
     document.getElementById("ac_bouton_valider").onclick = function() {
         // Récupération et stockage du nombre de colis rentrés.
@@ -188,6 +187,14 @@ function creation_commande_p1(commande_id=null) {
     else {
         document.getElementById("ac_bouton_annuler").innerHTML = "annuler";
     }
+
+    document.getElementById("ac_input_colis").focus()
+    document.getElementById("ac_input_colis").onchange = function() {
+        document.getElementById("ac_bouton_valider").click();
+    }
+    let val = document.getElementById("ac_input_colis").value;
+    document.getElementById("ac_input_colis").value = '';
+    document.getElementById("ac_input_colis").value = val;
 }
 
 // Vérifie le conditions lors de la saisie d'un nombre de colis dans l'input.

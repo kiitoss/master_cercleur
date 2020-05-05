@@ -2,7 +2,7 @@
 var AP_palette_place_vide = 0;
 var AP_meilleur_palette = [];
 var compteur_recursion = 0;
-var max_recursion = 1000000;
+var max_recursion = 10000000;
 
 // Initialisation des variables.
 var AP_hauteur_max = 0;
@@ -83,9 +83,10 @@ function AP_change_hauteur_max() {
     
     let modif = false;
     for (let i=0; i<AP_liste_colis_modifie.length; i++) {
-        if (AP_liste_colis_modifie[i][0] >= AP_facteur_superposition) {
-            modif = true;
-        }
+        // if (AP_liste_colis_modifie[i][0] >= AP_facteur_superposition) {
+        //     modif = true;
+        // }
+        modif = true;
         let facteur = 2;
         while (AP_liste_colis_modifie[i][0] >= facteur) {
             if ((AP_liste_colis_modifie[i][3] * facteur > AP_hauteur_max) && (AP_liste_colis_modifie[i][3] * facteur <= plus_petit_max)) {
@@ -95,6 +96,8 @@ function AP_change_hauteur_max() {
             facteur++;
         }
     }
+
+
 
     AP_hauteur_max = plus_petit_max;
     if (modif) {
@@ -174,6 +177,7 @@ function AP_place(ma_palette, index, pos_x, pos_y, liste_places) {
     for (let i=0; i<AP_LC.length; i++) {
         aire_totale += (AP_LC[i].longueur * AP_LC[i].largeur);
     }
+
     if (aire_totale > palette_infos.longueur * palette_infos.largeur) {
         AP_facteur_superposition++;
         AP_change_hauteur_max();
@@ -186,38 +190,6 @@ function AP_place(ma_palette, index, pos_x, pos_y, liste_places) {
 
     let colis = AP_LC[index];
 
-    // let repetition = 1;
-
-    // if (colis.longueur != colis.largeur) {
-    //     repetition = 2;
-    // }
-    // for (let k=0; k<repetition; k++) {
-    //     //Initialise les valeurs.
-    //     let cp_index = index;
-    //     let nouvelle_palette = [];
-    //     let cp_pos_x = pos_x;
-    //     let cp_pos_y = pos_y;
-    //     for (let j=0; j<ma_palette.length; j++) {
-    //         nouvelle_palette.push([]);
-    //         for (let i=0; i<ma_palette[j].length; i++) {
-    //             nouvelle_palette[j].push(ma_palette[j][i]);
-    //         }
-    //     }
-    //     let cp_liste_places = [];
-    //     for (let i=0; i<liste_places.length; i++) {
-    //         cp_liste_places.push(liste_places[i]);
-    //     }
-
-    //     // Lance la fonction de placement (longueur).
-    //     AP_place_longueur(nouvelle_palette, colis, cp_pos_x, cp_pos_y, cp_liste_places, cp_index);
-    
-    //     // Si la longueur est différente de la largeur, on reproduit en inversant longueur/largeur.
-    //     if (colis.longueur != colis.largeur) {
-    //         let change = colis.longueur;
-    //         colis.longueur = colis.largeur;
-    //         colis.largeur = change;
-    //     }
-    // }
 
     let cp_index = index;
     let nouvelle_palette = [];
@@ -240,7 +212,7 @@ function AP_place(ma_palette, index, pos_x, pos_y, liste_places) {
 
 // Place le colis sur tous les espaces possibles de la AP_palette, appel 'place()' à chaque placement valide.
 function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_index) {
-    compteur_recursion++;
+    // compteur_recursion++;
     if ((test_palette[pos_y].length - pos_x < colis.longueur) || test_palette.length - pos_y < colis.largeur) {
         return false;
     }
@@ -259,9 +231,6 @@ function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_i
     }
 
     if (!AP_placement_ok) {
-        // if (compteur_recursion > max_recursion) {
-        //     return;
-        // }
         for (let j=0; j<test_palette.length - colis.largeur + 1; j++) {
             for (let i=0; i<test_palette[j].length - colis.longueur + 1; i++) {
                 free_position = true;
@@ -351,6 +320,9 @@ function AP_first_main() {
 
     AP_creation_lc_modif();
     AP_tri_hauteur([]);
+
+    
+
 
     AP_hauteur_max = AP_liste_colis_modifie[0][3];
     AP_LC = [];
