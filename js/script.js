@@ -20,6 +20,8 @@ status_creation_commande.nb_palettes = null;
 
 var param_modifie = false;
 
+var id_refuses = [];
+
 affichage_commandes_memoire();
 
 function ajout_commande() {
@@ -223,11 +225,27 @@ function test_hauteur_accepte(commande_id) {
         document.getElementById("type_cagette_commande_"+commande_id).style.backgroundColor = "red";
         document.getElementById("nb_colis_commande_"+commande_id).style.backgroundColor = "red";
         document.getElementById("nb_palettes_commande_"+commande_id).style.backgroundColor = "red";
+        let deja_present = false;
+        for (let i=0; i<id_refuses.length; i++) {
+            if (id_refuses[i] == commande_id) {
+                deja_present = true;
+                break;
+            }
+        }
+        if (!deja_present) {
+            id_refuses.push(commande_id);
+        }
     }
     else {
         document.getElementById("type_cagette_commande_"+commande_id).style.backgroundColor = "white";
         document.getElementById("nb_colis_commande_"+commande_id).style.backgroundColor = "white";
         document.getElementById("nb_palettes_commande_"+commande_id).style.backgroundColor = "transparent";
+        for (let i=0; i<id_refuses.length; i++) {
+            if (id_refuses[i] == commande_id) {
+                id_refuses.splice(i, 1);
+                break;
+            }
+        }
     }
 }
 
@@ -391,8 +409,19 @@ function change_background_bouton(id_bouton, nb_palettes) {
 }
 
 function valider() {
-    sauvegarder_commandes_memoire(true);
-    location.href = "./palette_puzzle.html";
+    let confirme = false;
+    if (id_refuses.length > 0) {
+        if (confirm("Des commandes sont plus grandes que la hauteur maximum autorisée, voulez-vous continuer ?")) {
+            confirme = true;
+        }
+    }
+
+    if (id_refuses.length == 0 || confirme) {
+        if (document.getElementsByClassName("ligne_commande").length != 0) {
+            sauvegarder_commandes_memoire(true);
+            location.href = "./palette_puzzle.html";
+        }
+    }
 }
 
 function sauvegarder_commandes_memoire(changement_page=false) {
@@ -1020,6 +1049,17 @@ function erase_commandes() {
     while (main.firstChild.id != "inserer_valider") {
         main.removeChild(main.firstChild);
     }
+
+    document.getElementById("annule_erase").style.visibility = "visible";
+}
+
+function cancel_erase() {
+    main = document.getElementById("main");
+    while (main.firstChild.id != "inserer_valider") {
+        main.removeChild(main.firstChild);
+    }
+    affichage_commandes_memoire();
+    document.getElementById("annule_erase").style.visibility = "hidden";
 }
 
 function change_hauteur(input) {
