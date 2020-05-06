@@ -1002,7 +1002,6 @@ function algo_combinaison() {
         return;
     }
     else if (commandes_valides == 2) {
-        console.log("Tout rentre");
         return;
     }
     trouve_meilleur([], AC_liste_commandes);

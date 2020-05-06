@@ -47,6 +47,7 @@ function ajout_commande() {
     input_colis.setAttribute("id", "nb_colis_commande_"+status_creation_commande.id_commande);
     input_colis.setAttribute("id_commande", status_creation_commande.id_commande);
     input_colis.setAttribute("size", "1");
+
     input_colis.onclick = function() {
         creation_commande_p1(this.getAttribute("id_commande"));
     }
@@ -102,6 +103,7 @@ function ajout_commande() {
 
     change_background_bouton("nb_palettes_commande_"+status_creation_commande.id_commande, status_creation_commande.nb_palettes);
 
+    test_hauteur_accepte(status_creation_commande.id_commande);
     status_creation_commande.id_commande += 1;
 }
 
@@ -174,6 +176,7 @@ function creation_commande_p1(commande_id=null) {
         }
         else {
             document.getElementById("nb_colis_commande_"+commande_id).value = parseInt(nb_colis);
+            test_hauteur_accepte(commande_id);
             terminer_ajout(false);
         }
     }
@@ -195,6 +198,37 @@ function creation_commande_p1(commande_id=null) {
     let val = document.getElementById("ac_input_colis").value;
     document.getElementById("ac_input_colis").value = '';
     document.getElementById("ac_input_colis").value = val;
+}
+
+
+function test_hauteur_accepte(commande_id) {
+    let type_colis = null;
+    for (let i=0; i<liste_colis.length; i++) {
+        if (liste_colis[i].nom == document.getElementById("type_cagette_commande_"+commande_id).value) {
+            type_colis = liste_colis[i];
+            break;
+        }
+    }
+
+    let nb_colis = document.getElementById("nb_colis_commande_"+commande_id).value;
+    let nb_rangs = parseInt(nb_colis / type_colis.nb_par_rang);
+    if (nb_colis % type_colis.nb_par_rang != 0) {
+        nb_rangs++;
+    }
+
+    let nb_palettes = document.getElementById("nb_palettes_commande_"+commande_id).innerHTML;
+    let hauteur_commande = nb_rangs * type_colis.hauteur + nb_palettes * palette_infos.hauteur;
+
+    if (hauteur_commande > hauteur_max) {
+        document.getElementById("type_cagette_commande_"+commande_id).style.backgroundColor = "red";
+        document.getElementById("nb_colis_commande_"+commande_id).style.backgroundColor = "red";
+        document.getElementById("nb_palettes_commande_"+commande_id).style.backgroundColor = "red";
+    }
+    else {
+        document.getElementById("type_cagette_commande_"+commande_id).style.backgroundColor = "white";
+        document.getElementById("nb_colis_commande_"+commande_id).style.backgroundColor = "white";
+        document.getElementById("nb_palettes_commande_"+commande_id).style.backgroundColor = "transparent";
+    }
 }
 
 // Vérifie le conditions lors de la saisie d'un nombre de colis dans l'input.
@@ -243,6 +277,7 @@ function creation_commande_p2(commande_id=null) {
             }
             else {
                 document.getElementById("type_cagette_commande_"+commande_id).value = this.getAttribute("label");
+                test_hauteur_accepte(commande_id);
                 terminer_ajout(false);
             }
                        
@@ -323,6 +358,7 @@ function creation_commande_p3(commande_id=null) {
             else {
                 document.getElementById("nb_palettes_commande_"+commande_id).innerHTML = i;
                 change_background_bouton("nb_palettes_commande_"+commande_id, i);
+                test_hauteur_accepte(commande_id);
                 terminer_ajout(false);
             }
         }
