@@ -107,6 +107,7 @@ function ajout_commande() {
 
     test_hauteur_accepte(status_creation_commande.id_commande);
     status_creation_commande.id_commande += 1;
+
 }
 
 // Valide ou annule l'ajout d'une nouvelle commande.
@@ -1045,6 +1046,22 @@ function valider_parametres() {
 }
 
 function erase_commandes() {
+    let liste_commandes = [];
+    lignes_commandes = document.getElementsByClassName("ligne_commande");
+    if (lignes_commandes.length == 0) {
+        return;
+    }
+    for (let i=0; i<lignes_commandes.length; i++) {
+        let id_commande = parseInt(lignes_commandes[i].getAttribute("id").substr(3));
+        let nb_colis_commande = parseInt(document.getElementById("nb_colis_commande_"+id_commande).value);
+        let type_cagette_commande = document.getElementById("type_cagette_commande_"+id_commande).value;
+        let nb_palettes_commande = document.getElementById("nb_palettes_commande_"+id_commande).innerHTML;
+        liste_commandes.push([nb_colis_commande, type_cagette_commande, nb_palettes_commande])
+    }
+
+    session_commandes = liste_commandes;
+
+    sauvegarder_commandes_memoire();
     main = document.getElementById("main");
     while (main.firstChild.id != "inserer_valider") {
         main.removeChild(main.firstChild);

@@ -29,6 +29,7 @@ var couleurs_meileur_placement = [
 // var mes_palettes = [];
 var min_palettes = null;
 var meilleur_agencement = null;
+var min_hauteur_dangereuse = null;
 var AC_liste_commandes = [];
 
 
@@ -922,13 +923,29 @@ function verifie_commandes_ok() {
 // Si une combinaison a déjà été trouvé et que la combinaison en cours de recherche est moins avantageuse,
 // (si le nombre de palettes au sol est supérieur), la recherche pour cette combinaison est arretée.
 function trouve_meilleur(liste_palettes, reste) {
-    if (min_palettes != null && liste_palettes.length >= min_palettes) {
+    if (min_palettes != null && liste_palettes.length > min_palettes) {
         return;
     }
     let total_commandes = compte_commandes(liste_palettes);
-    if (total_commandes == AC_liste_commandes.length && (min_palettes == null || liste_palettes.length < min_palettes)) {
-        min_palettes = liste_palettes.length;
-        meilleur_agencement = liste_palettes;
+    if (total_commandes == AC_liste_commandes.length && (min_palettes == null || liste_palettes.length <= min_palettes)) {
+        if (min_palettes != null && liste_palettes.length < min_palettes) {
+            min_hauteur_dangereuse = null;
+        }
+        let compte_hauteur_dangereuse = 0;
+        for (let i=0; i<liste_palettes.length; i++) {
+            let hauteur_palette = 0;
+            for (let j=0; j<liste_palettes[i].length; j++) {
+                hauteur_palette += liste_palettes[i][j].hauteur_total;
+            }
+            if (hauteur_palette > hauteur_dangereuse) {
+                compte_hauteur_dangereuse++;
+            }
+        }
+        if (min_hauteur_dangereuse == null || min_hauteur_dangereuse > compte_hauteur_dangereuse) {
+            min_hauteur_dangereuse = compte_hauteur_dangereuse;
+            min_palettes = liste_palettes.length;
+            meilleur_agencement = liste_palettes;
+        }
         return;
     }
 
