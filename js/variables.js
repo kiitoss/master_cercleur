@@ -1,4 +1,3 @@
-// localStorage.clear();
 var hauteur_max = 0;
 var CH_hauteur_max = localStorage.getItem('CH_hauteur_max');
 if (!CH_hauteur_max || CH_hauteur_max == null || CH_hauteur_max == undefined) {
@@ -80,7 +79,6 @@ function TypeColis(nom, longueur, largeur, hauteur, couleur) {
     this.nb_par_rang = parseInt(palette_infos.longueur / this.longueur) * parseInt(palette_infos.largeur / this.largeur);
 }
 
-
 function Palette(longueur, largeur, hauteur, couleur) {
     this.nom = "palette";
     this.longueur = parseInt(longueur);
@@ -91,7 +89,6 @@ function Palette(longueur, largeur, hauteur, couleur) {
 
     this.couleur = "#"+couleur;
 }
-
 
 function color_hex(rgb) { 
     let hex = Number(rgb).toString(16);

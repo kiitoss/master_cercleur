@@ -1,8 +1,6 @@
 // Création d'une copie de la AP_palette pour conserver la meilleure AP_palette pendant la recherche.
 var AP_palette_place_vide = 0;
 var AP_meilleur_palette = [];
-var compteur_recursion = 0;
-var max_recursion = 10000000;
 
 // Initialisation des variables.
 var AP_hauteur_max = 0;
@@ -29,15 +27,6 @@ function AP_creation_lc_modif() {
         
         AP_liste_colis_modifie.push([quantite, type_colis.longueur, type_colis.largeur, type_colis.hauteur, superpose, type_colis.nom]);
     }
-}
-
-function AP_type_colis(nom, longueur, largeur, hauteur, nb_par_rang, couleur) {
-    this.nom = nom;
-    this.longueur = longueur;
-    this.largeur = largeur;
-    this.hauteur = hauteur;
-    this.nb_par_rang = nb_par_rang;
-    this.couleur = couleur;
 }
 
 // Créé l'objet Colis.
@@ -83,9 +72,6 @@ function AP_change_hauteur_max() {
     
     let modif = false;
     for (let i=0; i<AP_liste_colis_modifie.length; i++) {
-        // if (AP_liste_colis_modifie[i][0] >= AP_facteur_superposition) {
-        //     modif = true;
-        // }
         modif = true;
         let facteur = 2;
         while (AP_liste_colis_modifie[i][0] >= facteur) {
@@ -152,7 +138,6 @@ function AP_superpose_colis() {
     AP_main();
 }
 
-
 // Lanceur de la fonction 'place()' après avoir copié la AP_palette.
 function AP_test_placement() {
     AP_creation_LC();
@@ -212,7 +197,6 @@ function AP_place(ma_palette, index, pos_x, pos_y, liste_places) {
 
 // Place le colis sur tous les espaces possibles de la AP_palette, appel 'place()' à chaque placement valide.
 function AP_place_longueur(test_palette, colis, pos_x, pos_y, colis_places, my_index) {
-    // compteur_recursion++;
     if ((test_palette[pos_y].length - pos_x < colis.longueur) || test_palette.length - pos_y < colis.largeur) {
         return false;
     }

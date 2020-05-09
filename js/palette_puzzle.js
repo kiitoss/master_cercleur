@@ -8,7 +8,6 @@ var dessin_reste = null;
 var AP_liste_colis = [];
 var AP_result = [];
 
-var meilleur_placement = null;
 var couleurs_meileur_placement = [
     "red",
     "blue",
@@ -22,11 +21,6 @@ var couleurs_meileur_placement = [
     "orange"
 ]
 
-// var recursion_max = 10000;
-
-
-// var possibilite = [];
-// var mes_palettes = [];
 var min_palettes = null;
 var meilleur_agencement = null;
 var min_hauteur_dangereuse = null;
@@ -294,12 +288,10 @@ function ajout_suppression_commande(commande, auto=false) {
     commande.estAffiche = !commande.estAffiche;
     if (commande.estAffiche) {
         bouton.style.backgroundColor = "green";
-        // bouton.style.borderColor = "green";
         bouton.style.color = "white";
     }
     else {
         bouton.style.backgroundColor = "white";
-        // bouton.style.borderColor = "white";
         bouton.style.color = "black";
     }
 
@@ -311,8 +303,6 @@ function ajout_suppression_commande(commande, auto=false) {
 }
 
 function change_couleur_fond(hauteur_atteinte) {
-    // console.log(hauteur_atteinte);
-    // hauteur_atteinte = parseFloat(parseInt(hauteur_atteinte*100))/100;
     document.getElementById("label_hauteur_actuelle").innerHTML = "Hauteur actuelle: "+hauteur_atteinte.toFixed(2);
 
     if (hauteur_atteinte > hauteur_max) {
@@ -386,9 +376,6 @@ function clique_optimisation(mouse_clique=true) {
             parent.removeChild(parent.lastChild);
         }
         fusion_colis_identiques(old_commande);
-        // for (let i=0; i<old_commande.length; i++) {
-        //     affecte_hauteurs_couleur(old_commande[i]);
-        // }
     }
     else {
         document.getElementById("voir_detail").style.display = "none";
@@ -401,7 +388,6 @@ function clique_optimisation(mouse_clique=true) {
         hauteur_atteinte += old_commande[i].hauteur_total;
     }
     if (optimisation_en_cours && (hauteur_atteinte > hauteur_dangereuse)) {
-    // if (optimisation_en_cours) {
         optimise_reste(old_commande);
     }
     else {
@@ -504,7 +490,6 @@ function optimise_reste(old_commande, cherche_meilleur=false) {
             }
             else {
                 return null;
-                // location.reload();
             }
         }
         return hauteur_actuelle;
@@ -657,9 +642,6 @@ function creation_top(palette, cherche_meilleur=false) {
         dessin_palette.appendChild(new_colis);
     
 
-
-
-
         let new_colis_reste = document.createElement("div");
         new_colis_reste.setAttribute("class", "new_colis_reste");
         new_colis_reste.style.width = (colis_palette[i][5]*colis_palette[i][6] / aire_palette) * (Math.min(window.innerHeight, window.innerWidth) * 0.7)+"px";
@@ -760,7 +742,6 @@ function fusion_colis_identiques(old_commande) {
 function creation_detail(restes) {
     let palette_hauteur = 14.5;
     let liste_restes = [];
-    let hauteur_totale = 0;
     for (let i=0; i<liste_colis.length; i++) {
         liste_restes.push([liste_colis[i].nom, liste_colis[i].hauteur, 0]);
     }
@@ -819,13 +800,6 @@ function creation_detail(restes) {
     document.getElementById("voir_detail").style.display = "block";
 }
 
-
-
-
-
-
-
-
 function copie_commandes(liste_commandes) {
     let copie = [];
     for (let i=0; i<liste_commandes.length; i++) {
@@ -833,7 +807,6 @@ function copie_commandes(liste_commandes) {
     }
     return copie;
 }
-
 
 function calcul_meilleur_possibilite() {
     AC_liste_commandes = copie_commandes(liste_commandes);
@@ -845,12 +818,6 @@ function calcul_meilleur_possibilite() {
         }
     }
 }
-
-
-
-
-
-
 
 // Retourne une liste de toutes les combinaisons possibles d'empilements de commandes.
 function trouve_possible(commandes_places, reste, valides) {
@@ -918,7 +885,6 @@ function verifie_commandes_ok() {
     return 1;
 }
 
-
 // Trouve le meilleur empilement par récursion.
 // Si une combinaison a déjà été trouvé et que la combinaison en cours de recherche est moins avantageuse,
 // (si le nombre de palettes au sol est supérieur), la recherche pour cette combinaison est arretée.
@@ -980,7 +946,6 @@ function compte_commandes(liste_palettes) {
     return qte;
 }
 
-
 // Copie la liste de palettes.
 function copie_liste_palettes(liste_palettes) {
     let copie = [];
@@ -989,7 +954,6 @@ function copie_liste_palettes(liste_palettes) {
     }
     return copie;
 }
-
 
 // Copie la liste des restes.
 function copie_reste(reste, commandes=[]) {
@@ -1023,100 +987,3 @@ function algo_combinaison() {
     }
     trouve_meilleur([], AC_liste_commandes);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function ajoute_palette(palettes_au_sol, index_palette, a_placer) {
-//     recursion_max--;
-//     if (recursion_max<=0) {
-//         return;
-//     }
-//     if ((meilleur_placement != null) && (palettes_au_sol.length >= meilleur_placement.length)) {
-//         return;
-//     }
-    
-
-//     if (a_placer.length == 0 && (meilleur_placement == null || palettes_au_sol.length < meilleur_placement.length)) {
-//         meilleur_placement = palettes_au_sol;
-//         return;
-//     }
-
-
-//     for (let i=0; i<a_placer.length; i++) {
-//         let cp_a_placer = copie_liste_objets(a_placer);
-//         let cp_liste_palettes = copie_palettes(palettes_au_sol);
-//         cp_liste_palettes[index_palette].push(cp_a_placer[i]);
-//         cp_a_placer.splice(i, 1);
-//         let hauteur_atteinte = 0;
-//         for (let k=0; k<cp_liste_palettes[index_palette].length; k++) {
-//             hauteur_atteinte += cp_liste_palettes[index_palette][k].hauteur_total;
-//         }
-//         if (hauteur_atteinte <= hauteur_max) {
-//             ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
-//         }
-//         else {
-//             fusion_colis_identiques(cp_liste_palettes[index_palette]);
-//             let hauteur_atteinte = 0;
-//             for (let k=0; k<cp_liste_palettes[index_palette].length; k++) {
-//                 hauteur_atteinte += cp_liste_palettes[index_palette][k].hauteur_total;
-//             }
-//             if (hauteur_atteinte <= hauteur_max) {
-//                 ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
-//             }
-//             else {
-//                 hauteur_amelioree = optimise_reste(cp_liste_palettes[index_palette], true);
-//                 if (hauteur_amelioree != null && hauteur_amelioree <= hauteur_max) {
-//                     ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
-//                 }
-//                 else {
-//                     let commande_non_place = cp_liste_palettes[index_palette].splice(cp_liste_palettes[index_palette].length - 1, 1);
-//                     cp_liste_palettes.push(commande_non_place);
-//                     ajoute_palette(cp_liste_palettes, index_palette, cp_a_placer);
-//                     ajoute_palette(cp_liste_palettes, index_palette+1, cp_a_placer);
-//                 }
-//             }
-//         }
-//     }
-// }
-
-// function copie_liste_objets(liste_objets) {
-//     let liste_copiee = [];
-//     for (let i=0; i<liste_objets.length; i++) {
-//         liste_copiee.push(JSON.parse(JSON.stringify(liste_objets[i])));
-//     }
-//     return liste_copiee;
-// }
-
-// function copie_palettes(liste_palettes) {
-//     let liste_copiee = [];
-//     for (let j=0; j<liste_palettes.length; j++) {
-//         liste_copiee.push([]);
-//         for (let i=0; i<liste_palettes[j].length; i++) {
-//             liste_copiee[j].push(JSON.parse(JSON.stringify(liste_palettes[j][i])));
-//         }
-//     }
-//     return liste_copiee;
-// }
-
-
-
-
-

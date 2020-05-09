@@ -203,7 +203,6 @@ function creation_commande_p1(commande_id=null) {
     document.getElementById("ac_input_colis").value = val;
 }
 
-
 function test_hauteur_accepte(commande_id) {
     let type_colis = null;
     for (let i=0; i<liste_colis.length; i++) {
@@ -642,9 +641,6 @@ function param_ajouter_colis(element, palette=false) {
 
 function modifie_valeur_titre(element) {
     document.getElementById("param_hauteurs").style.display = "none";
-    // document.getElementById("param_bouton_retour_arriere").onclick = function() {
-    //     ouvre_param(false);
-    // }
     document.getElementById("ajouter_colis").style.display = "none";
     document.getElementById("valider_param").style.display = "none";
 
@@ -905,7 +901,6 @@ function creation_colis_p1(nouveau_colis) {
 }
 
 function creation_colis_p2(nouveau_colis) {
-    let couleur = "#ff0000";
     param_liste_colis = document.getElementById("param_liste_colis");
     while (param_liste_colis.firstChild) {
         param_liste_colis.removeChild(param_liste_colis.lastChild);
@@ -1109,6 +1104,9 @@ function affichage_commandes_memoire() {
             }
             else {
                 alert("Le colis "+session_commandes[i][1]+" n'existe plus, la commande en mémoire a donc été effacée.");
+                session_commandes.splice(i, 1);
+                i--;
+                terminer_ajout(false);
             }
         }
     }
