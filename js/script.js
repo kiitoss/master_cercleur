@@ -1074,13 +1074,17 @@ function cancel_erase() {
     document.getElementById("annule_erase").style.visibility = "hidden";
 }
 
-function change_hauteur(input) {
-    input.blur();
+function change_hauteur() {
     param_modifie = true;
     hauteur_max = parseFloat(document.getElementById("data_hauteur_max").value);
     hauteur_dangereuse = parseFloat(document.getElementById("data_hauteur_dangereuse").value);
     document.getElementById("valider_param").style.backgroundColor = "green";
     document.getElementById("valider_param").style.borderColor = "green";
+}
+
+function valide_hauteur(input) {
+    input.blur();
+    change_hauteur();
 }
 
 function affichage_commandes_memoire() {

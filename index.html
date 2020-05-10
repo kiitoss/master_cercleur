@@ -38,11 +38,11 @@
         <div id="param_hauteurs">
             <div>
                 <p class="label_hauteur">Hauteur max: </p>
-                <input type="number" class="data_hauteur" id="data_hauteur_max" step="0.01" onchange="change_hauteur(this)"/>
+                <input type="number" class="data_hauteur" id="data_hauteur_max" step="0.01" oninput="change_hauteur()" onchange="valide_hauteur(this)"/>
             </div>
             <div>
                 <p class="label_hauteur">Hauteur dangereuse: </p>
-                <input type="number" class="data_hauteur" id="data_hauteur_dangereuse" step="0.01" onchange="change_hauteur(this)"/>
+                <input type="number" class="data_hauteur" id="data_hauteur_dangereuse" step="0.01" oninput="change_hauteur()" onchange="valide_hauteur(this)"/>
             </div>
         </div>
         <ul id="param_liste_colis"></ul>
